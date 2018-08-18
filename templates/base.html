@@ -6,7 +6,7 @@
 {% load placeholder %}
 {% load translate_url from urls %}
 
-<html lang="{{ LANGUAGE_CODE }}" class="no-js" data-shipping-options-url="{% url 'cart:shipping-options' %}" data-cart-summary-url="{% url 'cart:summary' %}">
+<html class="no-js" data-shipping-options-url="{% url 'cart:shipping-options' %}" data-cart-summary-url="{% url 'cart:summary' %}">
 <head>
   <title>BlitzShop</title>
   {% block meta %}
@@ -20,53 +20,12 @@
     <meta name="apple-mobile-web-app-title" content="{{ site.name }}">
     <meta name="og:type" content="website">
     {% get_available_languages as LANGUAGES %}
-    {% for lang_code, language_name in LANGUAGES %}
-      <link rel="alternate" hreflang="{{ lang_code }}" href="{% translate_url url=request.path lang_code=lang_code %}" />
-    {% endfor %}
   {% endblock meta %}
-
   {% include 'favicon.html' %}
   {% render_bundle 'storefront' 'css' attrs='async' %}
 
   {% block stylesheet %}
-  <style>
-
-
-  /* Show the dropdown menu on hover */
-  .dropdown:hover .dropdown-menu1 {display: block;}
-
-  /* Change the background color of the dropdown button when the dropdown content is shown */
-  .dropdown:hover .dropdown-toggle {background-color: #f1f1f1;}
-
-  .dropdown-toggle {
-    border: none;
-  }
-
-  /* The container <div> - needed to position the dropdown content */
-  .dropdown {
-      position: relative;
-      display: inline-block;
-  }
-
-  /* Dropdown Content (Hidden by Default) */
-  .dropdown-menu1 {
-      display: none;
-      margin-top: -1px;
-      position: absolute;
-      background-color: #ffffff;
-      min-width: 160px;
-      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-      z-index: 1;
-  }
-
-  /* Links inside the dropdown */
-  .dropdown-menu1 a {
-      color: black;
-      padding: 12px 16px;
-      text-decoration: none;
-      display: block;
-  }
-  </style>
+ 
   {% endblock stylesheet %}
 
   {% block meta_tags %}
@@ -77,6 +36,7 @@
 
   <link rel="manifest" href="{% url "manifest" %}" />
 
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
   <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
   <!--[if lt IE 9]>
     <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -90,10 +50,22 @@
       <div class=" d-none d-md-block container">
       <div class="row">
         <div class="col-6">
-          <p class="text-left">{{ site.settings.header_text }}</p>
+          <p class="text-left">Добро пожаловать в BlitzShop!</p>
         </div>
         <div class="col-6">
           <ul class="float-right">
+            <li>
+                <a class="{% if horizontal %}nav-link{% endif %}" 
+                  href="https://blitzshop.ru/page/about_us">
+                  О нас
+                </a>
+            </li>
+            <li>
+                <a class="{% if horizontal %}nav-link{% endif %}" 
+                  href="https://blitzshop.ru/page/contacts">
+                  Контакты
+                </a>
+            </li>
             {% if user.is_authenticated %}
               {% if user.is_staff or request.impersonator.is_staff %}
                 <li>
@@ -145,7 +117,8 @@
             <a href="{% url 'home' %}">
               <svg data-src="{% static "images/logo.svg" %}" height="38px" width="176px"/>
             </a>
-          </div>
+            </div>
+          
           <div class="col-2 col-md-4 navbar__search static">
             {% if SEARCH_IS_ENABLED %}
               <div class="d-md-none mobile-search-icon">
@@ -157,7 +130,7 @@
                 </div>
                 <input class="form-control" type="text" name="q"
                        value="{% if query %}{{ query }}{% endif %}"
-                       placeholder="{% trans "Поиск товаров" %}"
+                       placeholder="Поиск товаров"
                        required>
                 <button class="btn btn-link" type="submit">
                   <svg data-src="{% static "images/search.svg" %}" width="30" height="30"/>
@@ -190,6 +163,7 @@
         </div>
       </div>
     </div>
+    
     <div class="navbar__menu container d-block">
       <nav class="navigation">
         {% menu site_menu=site.settings.top_menu horizontal=True %}
@@ -222,7 +196,18 @@
           </a>
         </div>
         <div class="col-md-3 col-sm-6">
-          {% menu site_menu=site.settings.bottom_menu %}
+          <ul>
+            <li>
+              <a rel="nofollow" href="https://blitzshop.ru/page/about_us">
+                О нас
+              </a>
+            </li>
+            <li>
+              <a rel="nofollow" href="https://blitzshop.ru/page/contacts">
+                Контакты
+              </a>
+            </li>
+          </ul>
         </div>
         <div class="col-md-3 col-sm-6">
           <ul>

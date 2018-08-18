@@ -118,12 +118,10 @@ class Order(models.Model):
         return super().save(*args, **kwargs)
 
     def is_fully_paid(self):
-        total_paid = sum(
-            [
-                payment.get_total_price() for payment in
-                self.payments.filter(status=PaymentStatus.CONFIRMED)],
-            ZERO_TAXED_MONEY)
-        return total_paid.gross >= self.total.gross
+        if self.status == OrderStatus.UNFULFILLED:
+            return False
+        else:
+            return True
 
     def get_user_current_email(self):
         return self.user.email if self.user else self.user_email
@@ -183,7 +181,7 @@ class Order(models.Model):
         return self.status == OrderStatus.DRAFT
 
     def is_open(self):
-        statuses = {OrderStatus.UNFULFILLED, OrderStatus.PARTIALLY_FULFILLED}
+        statuses = {OrderStatus.UNFULFILLED, OrderStatus.PARTIALLY_FULFILLED, OrderStatus.PAID}
         return self.status in statuses
 
     def can_cancel(self):
@@ -202,6 +200,7 @@ class OrderLine(models.Model):
     # max_length is as produced by ProductVariant's display_product method
     product_name = models.CharField(max_length=386)
     product_sku = models.CharField(max_length=32)
+    complectation = models.TextField(null=True, blank=True)
     is_shipping_required = models.BooleanField()
     quantity = models.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(999)])
@@ -222,7 +221,7 @@ class OrderLine(models.Model):
         return self.product_name
 
     def get_total(self):
-        return self.unit_price * self.quantity
+        return self.unit_price_gross * self.quantity
 
     @property
     def quantity_unfulfilled(self):

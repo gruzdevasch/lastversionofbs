@@ -106,20 +106,20 @@ def summary_without_shipping(request, cart):
     if note_form.is_valid():
         note_form.save()
 
-    user_addresses = cart.user.addresses.all()
+    user_addresses = cart.user.delivery_address
 
-    addresses_form, address_form, updated = update_billing_address_in_cart(
-        cart, user_addresses, request.POST or None, request.country)
+    #addresses_form, address_form, updated = update_billing_address_in_cart(
+    #    cart, user_addresses, request.POST or None, request.country)
 
-    if updated:
-        return handle_order_placement(request, cart)
+    #if updated:
+    #    return handle_order_placement(request, cart)
 
     taxes = get_taxes_for_cart(cart, request.taxes)
     ctx = get_cart_data_for_checkout(cart, request.discounts, taxes)
     ctx.update({
         'additional_addresses': user_addresses,
-        'address_form': address_form,
-        'addresses_form': addresses_form,
+       # 'address_form': address_form,
+       # 'addresses_form': addresses_form,
         'note_form': note_form})
     return TemplateResponse(
         request, 'checkout/summary_without_shipping.html', ctx)

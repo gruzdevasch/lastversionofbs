@@ -19,7 +19,131 @@ from ...product.utils.costs import (
     get_margin_for_variant, get_product_costs_data)
 from ..views import staff_member_required
 from .filters import ProductAttributeFilter, ProductFilter, ProductTypeFilter
+from django.core.files.storage import FileSystemStorage
+import csv, os
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
+import requests
+from urllib import error
+from urllib.request import urlopen, urlretrieve
 
+@staff_member_required
+@permission_required('product.view_product')
+def simple_product_upload(request):
+    myfile = request.FILES['myfile']
+    fs = FileSystemStorage()
+    filename = fs.save(myfile.name, myfile)
+    uploaded_file_url = fs.url(filename)
+
+    with open("/home/ubuntu/saleor-shop"+uploaded_file_url, encoding='utf-8') as f:
+        data = csv.reader(f,delimiter=";")
+        for row in data:
+            product = Product()
+            product.name = row[0]
+            product.description = row[1]
+            product.price = row[2]
+            product.product_type_id = row[5]
+            product.attributes = row[6]
+            product.is_featured = row[7]
+            product.is_published = row[8]
+            product.category_id = row[9]
+            product.seo_description = row[10]
+            product.seo_title = row[11]
+            product.charge_taxes = row[12]
+            product.tax_rate = row[13]
+            product.suplier_id = row[14]
+            index = 0
+            s = row[15]
+            flag1=False
+            flag2=False
+            for c in s:
+                if c.isupper() and index!=0:
+                    flag1=True
+                    position = index
+                if c == ':' and flag1:
+                    flag2=True
+                if flag1 and flag2:
+                    flag1 = False
+                    flag2 = False
+                    s = s[:position] + '\n' + s[position:]
+                    index +=1
+                index += 1
+            product.techdescription = s
+            index = 0
+            s = row[16]
+            flag1=False
+            flag2=False
+            for c in s:
+                if c.isupper() and index!=0:
+                    flag1=True
+                    position = index
+                if c == ':' and flag1:
+                    flag2=True
+                if flag1 and flag2:
+                    flag1 = False
+                    flag2 = False
+                    s = s[:position] + '\n' + s[position:]
+                    index +=1
+                index += 1
+            product.complectation = s
+            product.save()
+        f.close()
+    #os.remove(os.path.join(settings.MEDIA_ROOT, uploaded_file_url))
+    os.remove("/home/ubuntu/saleor-shop"+uploaded_file_url)
+    return redirect('dashboard:product-list')
+
+@staff_member_required
+@permission_required('product.view_product')
+def simple_picture_upload(request):
+    myfile = request.FILES['myfile']
+    fs = FileSystemStorage()
+    filename = fs.save(myfile.name, myfile)
+    uploaded_file_url = fs.url(filename)
+    with open("/home/ubuntu/saleor-shop"+uploaded_file_url) as f:
+        data = csv.reader(f,delimiter=";")
+        for row in data:
+            product = ProductImage()
+            img_temp = NamedTemporaryFile()
+            url = row[0]
+            try:
+                img_temp.write(urlopen(url).read())
+            except error.HTTPError as err:
+                continue
+            img_temp.flush()
+            product.product_id = row[4]
+            product.image.save(row[0].replace('/',''), File(img_temp))
+            product.ppoi = row[1]
+            product.alt = row[2]
+            product.sort_order = row[3]
+            product.save()
+        f.close()
+    #os.remove(os.path.join(settings.MEDIA_ROOT, uploaded_file_url))
+    os.remove("/home/ubuntu/saleor-shop"+uploaded_file_url)
+    return redirect('dashboard:product-list')
+
+@staff_member_required
+@permission_required('product.view_product')
+def simple_variant_upload(request):
+    myfile = request.FILES['myfile']
+    fs = FileSystemStorage()
+    filename = fs.save(myfile.name, myfile)
+    uploaded_file_url = fs.url(filename)
+    with open("/home/ubuntu/saleor-shop"+uploaded_file_url, encoding='utf-8') as f:
+        data = csv.reader(f,delimiter=";")
+        for row in data:
+            product = ProductVariant()
+            product.sku = row[0]
+            product.name = row[1]
+            product.product_id = row[3]
+            product.attributes = row[4]
+            product.quanity = row[6]
+            product.quantity_allocated = row[7]
+            product.track_inventory = row[8]
+            product.save()
+        f.close()
+    #os.remove(os.path.join(settings.MEDIA_ROOT, uploaded_file_url))
+    os.remove("/home/ubuntu/saleor-shop"+uploaded_file_url)
+    return redirect('dashboard:product-list')
 
 @staff_member_required
 @permission_required('product.view_product')
@@ -96,10 +220,7 @@ def product_select_type(request):
     template = 'dashboard/product/modal/select_type.html'
     return TemplateResponse(request, template, ctx, status=status)
 
-import logging
 
-# Get an instance of a logger
-logger = logging.getLogger(__name__)
 
 @staff_member_required
 @permission_required('product.edit_product')
@@ -120,7 +241,6 @@ def product_create(request, type_pk):
     else:
         variant_form = None
         variant_errors = False
-    logger.error(product_form.is_valid())
     if product_form.is_valid() and not variant_errors:
         product = product_form.save()
         if create_variant:
@@ -319,7 +439,7 @@ def variant_details(request, product_pk, variant_pk):
 @staff_member_required
 @permission_required('product.edit_product')
 def variant_create(request, product_pk):
-    track_inventory = request.site.settings.track_inventory_by_default
+    track_inventory = True
     product = get_object_or_404(Product.objects.all(), pk=product_pk)
     variant = ProductVariant(product=product, track_inventory=track_inventory)
     form = forms.ProductVariantForm(

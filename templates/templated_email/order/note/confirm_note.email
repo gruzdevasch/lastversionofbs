@@ -1,19 +1,19 @@
 {% load i18n %}
 
 {% block subject %}
-  {% trans "New note has been added to your order" context "Note confirmation email subject" %}
+  {% trans "Новый комментарий к вашему заказу." context "Note confirmation email subject" %}
 {% endblock %}
 
 {% block plain %}
 {% blocktrans context "Note confirmation email text" %}
-Hi!
+Здравствуйте!
 
-A new note has been added to your order. To see details please visit:
+У вашего заказа появился новый комментарий. Подробнее:
 {{ url }}
 
-This is an automatically generated email, please do not reply.
+Это автоматически созданное сообщение, пожалуйста, не отвечайте на него.
 
-Sincerely,
+Ваш,
 {{ site_name }}
 {% endblocktrans %}
 {% endblock %}

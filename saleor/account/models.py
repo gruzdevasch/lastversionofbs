@@ -22,17 +22,17 @@ class PossiblePhoneNumberField(PhoneNumberField):
 
 
 class Address(models.Model):
-    first_name = models.CharField(max_length=256, default = "")
-    last_name = models.CharField(max_length=256, default = "")
-    company_name = models.CharField(max_length=256, default = "")
-    street_address_1 = models.CharField(max_length=256, default = "")
-    street_address_2 = models.CharField(max_length=256, default = "")
-    city = models.CharField(max_length=256,default = "")
-    city_area = models.CharField(max_length=128, default = "")
-    postal_code = models.CharField(max_length=20, default = "")
-    country = CountryField(default = "Russian Federation")
-    country_area = models.CharField(max_length=128, default = "")
-    phone = PossiblePhoneNumberField(blank=True, default='')
+    first_name = models.CharField(max_length=256, default = "", blank=True, null=True)
+    last_name = models.CharField(max_length=256, default = "", blank=True, null=True)
+    company_name = models.CharField(max_length=256, default = "", blank=True, null=True)
+    street_address_1 = models.CharField(max_length=256, default = "", blank=True, null=True)
+    street_address_2 = models.CharField(max_length=256, default = "", blank=True, null=True)
+    city = models.CharField(max_length=256,default = "Красноярск", blank=True, null=True)
+    city_area = models.CharField(max_length=128, default = "", blank=True, null=True)
+    postal_code = models.CharField(max_length=20, default = "", blank=True, null=True)
+    country = CountryField(default = "Russian Federation", blank=True, null=True)
+    country_area = models.CharField(max_length=128, default = "", blank=True, null=True)
+    phone = PossiblePhoneNumberField(blank=True, default='', null=True)
 
     @property
     def full_name(self):
@@ -106,7 +106,7 @@ class User(PermissionsMixin, AbstractBaseUser):
     last_name = models.CharField(max_length=256, default = "")
 
     phone = PossiblePhoneNumberField(blank=True, default='')
-
+    delivery_address = models.CharField(max_length=256, default = "", blank=True, null=True)
     email = models.EmailField(unique=True)
     addresses = models.ManyToManyField(
         Address, blank=True, related_name='user_addresses')

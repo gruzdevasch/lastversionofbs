@@ -189,7 +189,7 @@
           <div class="card">
             <div class="card-content card-border">
               <span class="card-title black-text">
-                {% trans "Customer" context "Order details summary header" %}
+                Покупатель
                 {% if perms.order.edit_order and order.is_draft  %}
                   <span class="right">
                     <a href="#base-modal" data-href="{% url "dashboard:order-customer-edit" order_pk=order.pk %}" class="btn-flat waves-effect modal-trigger-custom"
@@ -231,23 +231,12 @@
             {% endif %}
             <div class="card-content">
               <span class="card-title black-text">
-                  {% trans "Billing address" context "" %}
-                  {% if perms.order.edit_order %}
-                    <span class="right">
-                      <a href="{% url "dashboard:address-edit" order_pk=order.pk address_type="billing" %}" class="btn-flat waves-effect">
-                        {% trans "Edit" context "Dashboard edit action" %}
-                      </a>
-                    </span>
-                  {% endif %}
+                  Адрес доставки
               </span>
-              {% if order.billing_address %}
-                {% if order.billing_address == order.shipping_address %}
-                  {% trans "Same as shipping address" context "Order billing address same as shipping address" %}
-                {% else %}
-                  {% format_address order.billing_address %}
-                {% endif %}
+              {% if order.user.delivery_address %}
+                {{ order.user.delivery_address }}
               {% else %}
-                {% trans "No billing address" context "Missing billing address message" %}
+                Нет адреса
               {% endif %}
             </div>
           </div>
@@ -305,7 +294,7 @@
                     <br>
                     <span class="grey-text">
                       {% blocktrans trimmed with sku=line.product_sku context "Order table text" %}
-                        SKU: {{ sku }}
+                        Артикул: {{ sku }}
                       {% endblocktrans %}
                     </span>
                   </td>
@@ -435,7 +424,7 @@
             {% if perms.order.edit_order %}
               {% if order.is_open %}
                 <a href="{% url 'dashboard:fulfill-order-lines' order_pk=order.pk %}" class="btn-flat waves-effect" title="{% trans "Fulfill order" context "Order summary card action title" %}">
-                  {% trans "Fulfill" context "Order summary card action" %}
+                  Отметить как заказанный
                 </a>
               {% endif %}
               {% if order.is_draft %}

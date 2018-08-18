@@ -65,6 +65,61 @@
       </div>
 
       <div class="card">
+        <div class="data-table-header{% if not suporders %} data-table-header--no-data{% endif %}">
+          <span class="data-table-title" title="{% blocktrans trimmed with counter=suporders|length context "Dashboard homepage summary header title" %}Showing last {{ counter }} results{% endblocktrans %}">
+            {% trans "Запросы к поставщикам" context "Dashboard homepage table title" %}
+          </span>
+        </div>
+        {% if suporders %}
+          <div class="data-table-container">
+            <table class="bordered highlight responsive data-table last-right-align">
+              <thead>
+                <tr>
+                  <th>
+                    #
+                  </th>
+                  
+                  <th>
+                    {% trans "Поставщик" context "Orders table header" %}
+                  </th>
+                  <th>
+                    {% trans "Payment status" context "Orders table header" %}
+                  </th>
+                  <th>
+                    {% trans "Total" context "Orders table header" %}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for suporder in suporders %}
+                  <tr data-action-go="{% url 'dashboard:suplierorder-details' order_pk=suporder.pk %}">
+                    <td>
+                      #{{ suporder.id }}
+                    </td>
+                    <td>
+                      {{ suporder.suplier.name }}
+                    </td>
+                    <td>
+                      {% render_status suporder.status %}
+                    </td>
+                    <td class="right-align">
+                      {% price suporder.total_net %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="card-content card-content--no-data not-found ">
+            <p class="grey-text">
+              {% trans "Нет заказов для поставщиков." context "Empty table message" %}
+            </p>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="card">
         <div class="data-table-header{% if not orders_to_ship %} data-table-header--no-data{% endif %}">
           <span class="data-table-title" title="{% blocktrans trimmed with counter=orders_to_ship|length context "Dashboard homepage summary header title" %}Showing last {{ counter }} results{% endblocktrans %}">
             {% trans "Orders ready for shipment" context "Dashboard homepage table title" %}

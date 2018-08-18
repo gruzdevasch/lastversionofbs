@@ -1,6 +1,5 @@
 from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models import Q
-
 from ...product.models import Product
 
 

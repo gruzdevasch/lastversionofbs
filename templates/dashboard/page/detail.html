@@ -14,7 +14,7 @@
   <ul class="breadcrumbs breadcrumbs--history">
     <li>
       <a href="{% url 'dashboard:page-list' %}" class="breadcrumb">
-        {% trans "Pages" context "Pages form breadcrumbs" %}
+        Страницы
       </a>
     </li>
     <li class="back-mobile">
@@ -40,17 +40,17 @@
           <span class="right">{% render_page_availability page %}</span>
           <span class="card-title">{{ page }}<br></span>
             <h4>
-              {% trans "Page URL" context "Page URL" %}
+              Ссылка
             </h4>
             {{ page.get_full_url }}
         </div>
         <div class="card-action">
           {% if perms.page.edit_page %}
             <a href="{% url 'dashboard:page-update' page.pk %}" class="btn-flat waves-effect">
-              {% trans "Edit page" context "Page action" %}
+              Редактировать
             </a>
             <a href="#base-modal" data-href="{% url 'dashboard:page-delete' pk=page.pk %}" class="modal-trigger-custom btn-flat waves-effect">
-              {% trans "Remove page" context "Page action" %}
+              Удалить
             </a>
           {% endif %}
           <a href="{% url "page:details" slug=page.slug %}" target="_blank" class="btn-flat waves-effect">

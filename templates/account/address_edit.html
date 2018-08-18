@@ -1,39 +1,27 @@
 {% extends "base.html" %}
 
 {% load i18n %}
-
+{% load bootstrap_form from bootstrap4 %}
 {% block title %}
-  {% if address_form.instance.pk %}
-    {% trans "Edit address" context "Edit address page title" %}
-  {% else %}
-    {% trans "New address" context "New address page title" %}
-  {% endif %} — {{ block.super }}{% endblock %}
+    {% trans "Изменить данные" context "Edit address page title" %} — {{ block.super }}{% endblock %}
 
 {% block breadcrumb %}
   <ul class="breadcrumbs list-unstyled">
     <li>
       <a href="{% url 'home' %}">
-        {% trans "Home" context "Main navigation item" %}
+       Главная
       </a>
     </li>
     <li>
       <a href="{% url "account:details" %}">
-        {% trans "Your profile" context "Edit/new address breadcrumb" %}
+        Мой аккаунт
       </a>
     </li>
-    {% if address_form.instance.pk %}
       <li>
         <a href=".">
-          {% trans "Edit address" context "Edit address breadcrumb" %}
+          Изменить данные
         </a>
       </li>
-    {% else %}
-      <li>
-        <a href=".">
-          {% trans "New address" context "New address breadcrumb" %}
-        </a>
-      </li>
-    {% endif %}
   </ul>
 {% endblock breadcrumb %}
 
@@ -43,16 +31,15 @@
       <form method="post" novalidate>
         {% csrf_token %}
         <h2 class="text-center">
-          {% if address_form.instance.pk %}
-            {% trans "Edit address" context "Edit address title" %}
-          {% else %}
-            {% trans "New address" context "New address title" %}
-          {% endif %}
+          Изменить данные
         </h2>
         <div class="account__address-edit__form">
-          {% include "account/snippets/address_form.html" %}
+           {% bootstrap_form form %}
         </div>
         <p class="text-right">
+          <a href="{% url 'account:details' %}" class="btn-flat waves-effect">
+                Отмена
+          </a>
           <button type="submit" class="btn primary narrow">
             {% trans "Save changes" context "Edit/new address primary action" %}
           </button>

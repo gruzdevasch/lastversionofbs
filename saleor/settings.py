@@ -26,9 +26,9 @@ def get_bool_from_env(name, default_value):
     return default_value
 
 
-DEBUG = get_bool_from_env('DEBUG', True)
+DEBUG = True
 
-SITE_ID = 1
+SITE_ID = 2
 
 PROJECT_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -49,39 +49,45 @@ if REDIS_URL:
     CACHE_URL = os.environ.setdefault('CACHE_URL', REDIS_URL)
 CACHES = {'default': django_cache_url.config()}
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default='postgres://postgres:toha1997@localhost:5432/baseforex',
-        conn_max_age=600)}
+DATABASES = { 
+  'default': { 
+      'ENGINE': 'django.db.backends.postgresql_psycopg2', 
+      'NAME': 'saleor', 
+      'USER': 'bdadmin', 
+      'PASSWORD': '31011997', 
+      'HOST': 'localhost', 
+      'PORT': '', 
+            } 
+}
+
 
 
 TIME_ZONE = 'Asia/Krasnoyarsk'
 LANGUAGE_CODE = 'ru'
 LANGUAGES = [
-    ('en', _('English')),
     ('ru', _('Russian')),]
 LOCALE_PATHS = [os.path.join(PROJECT_ROOT, 'locale')]
 USE_I18N = True
-USE_L10N = True
+USE_L10N = False
 USE_TZ = True
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 EMAIL_URL = False
 SENDGRID_USERNAME = "kilogrammteam@gmail.com"
-SENDGRID_PASSWORD = "gruwqttfsvmrrage"
+SENDGRID_PASSWORD = "ziztligdtbocsurr"
 if not EMAIL_URL and SENDGRID_USERNAME and SENDGRID_PASSWORD:
     EMAIL_URL = 'smtp://%s:%s@smtp.gmail.com:587/?tls=True' % (
         SENDGRID_USERNAME, SENDGRID_PASSWORD)
 email_config = dj_email_url.parse(EMAIL_URL or 'console://')
 
 EMAIL_FILE_PATH = email_config['EMAIL_FILE_PATH']
-EMAIL_HOST_USER = email_config['EMAIL_HOST_USER']
-EMAIL_HOST_PASSWORD = email_config['EMAIL_HOST_PASSWORD']
-EMAIL_HOST = email_config['EMAIL_HOST']
-EMAIL_PORT = email_config['EMAIL_PORT']
+EMAIL_HOST_USER = 'kilogrammteam@gmail.com'
+EMAIL_HOST_PASSWORD = 'ziztligdtbocsurr'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = '587'
 EMAIL_BACKEND = email_config['EMAIL_BACKEND']
-EMAIL_USE_TLS = email_config['EMAIL_USE_TLS']
+EMAIL_USE_TLS = True
 EMAIL_USE_SSL = email_config['EMAIL_USE_SSL']
 
 ENABLE_SSL = True
@@ -89,11 +95,13 @@ ENABLE_SSL = True
 if ENABLE_SSL:
     SECURE_SSL_REDIRECT = not DEBUG
 
-DEFAULT_FROM_EMAIL = "kilogrammteam@gmail.com"
+DEFAULT_FROM_EMAIL = 'kilogrammteam@gmail.com'
 ORDER_FROM_EMAIL = os.getenv('ORDER_FROM_EMAIL', DEFAULT_FROM_EMAIL)
 
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
 MEDIA_URL = '/media/'
+
+YANDEX_SECRET_KEY = 'jvgiEYtROjcVzgG5rIVYEPaH'
 
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 STATIC_URL = '/static/'
@@ -140,7 +148,7 @@ TEMPLATES = [{
         'string_if_invalid': '<< MISSING VARIABLE "%s" >>' if DEBUG else ''}}]
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = "kappakeepo123"
 
 MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -199,6 +207,7 @@ INSTALLED_APPS = [
     'django_babel',
     'bootstrap4',
     'django_prices',
+    'import_export',
     'django_prices_openexchangerates',
     'django_prices_vatlayer',
     'graphene_django',
@@ -286,8 +295,8 @@ AUTH_USER_MODEL = 'account.User'
 
 LOGIN_URL = '/account/login/'
 
-DEFAULT_COUNTRY = os.environ.get('DEFAULT_COUNTRY', 'RU')
-DEFAULT_CURRENCY = os.environ.get('DEFAULT_CURRENCY', 'RUB')
+DEFAULT_COUNTRY = 'RU'
+DEFAULT_CURRENCY = 'RUB'
 DEFAULT_DECIMAL_PLACES = get_currency_fraction(DEFAULT_CURRENCY)
 AVAILABLE_CURRENCIES = [DEFAULT_CURRENCY]
 COUNTRIES_OVERRIDE = {
@@ -303,7 +312,7 @@ VATLAYER_ACCESS_KEY = os.environ.get('VATLAYER_ACCESS_KEY')
 
 ACCOUNT_ACTIVATION_DAYS = 3
 
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = '/'
 
 GOOGLE_ANALYTICS_TRACKING_ID = os.environ.get('GOOGLE_ANALYTICS_TRACKING_ID')
 
@@ -350,7 +359,7 @@ bootstrap4 = {
 TEST_RUNNER = ''
 
 ALLOWED_HOSTS = get_list(
-    os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,www.blitzshop.ru'))
+    os.environ.get('ALLOWED_HOSTS', '18.219.171.45,www.blitzshop.ru,blitzshop.ru'))
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -491,7 +500,7 @@ ALLOWED_ATTRIBUTES = {
     'img': ['src']}
 ALLOWED_STYLES = ['text-align']
 
-
+IMPORT_EXPORT_USE_TRANSACTIONS = True
 # Slugs for menus precreated in Django migrations
 DEFAULT_MENUS = {
     'top_menu_name': 'navbar',

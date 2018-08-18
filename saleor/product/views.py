@@ -1,3 +1,5 @@
+
+#Welcome to Ubuntu 16.04.5 LTS (GNU/Linux 4.4.0-1062-aws x86_64)
 import datetime
 import json
 
@@ -5,7 +7,7 @@ from django.http import HttpResponsePermanentRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
-
+from ..order import SuplierOrderStatus
 from ..checkout.utils import set_cart_cookie
 from ..core.utils import serialize_decimal
 from ..seo.schema.product import product_json_ld
@@ -51,7 +53,11 @@ def product_details(request, slug, product_id, form=None):
     """
     products = products_with_details(user=request.user)
     product = get_object_or_404(products, id=product_id)
-    product_suplier_percentage = product.suplier.orders.get_or_create(status="CURRENT", suplier=product.suplier)[0].total_net.amount / 100
+    if not product.suplier:
+        product_suplier_percentage = 0
+    else:
+        product_suplier_percentage = product.suplier.orders.get_or_create(status=SuplierOrderStatus.CURRENT, suplier=product.suplier)[0].total_net.amount / 100
+    
     if product.get_slug() != slug:
         return HttpResponsePermanentRedirect(product.get_absolute_url())
     today = datetime.date.today()

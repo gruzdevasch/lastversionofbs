@@ -26,9 +26,6 @@
           {% trans "Shipping Details" context "Packing slip shipping details" %}
         </th>
       {% endif %}
-      <th align="left"{% if order.shipping_address %} width="50%"{% endif %}>
-        {% trans "Billing Details" context "Packing slip shipping details" %}
-      </th>
     </tr>
     </thead>
   <tbody>
@@ -43,14 +40,6 @@
         {% endwith %}
       </td>
     {% endif %}
-    <td valign="top">
-      {% with order.billing_address as address %}
-        <h2>
-          {% trans "Billing address" context "Packing slip billing address" %}
-        </h2>
-        {% include 'dashboard/includes/_address.html' with address=address only %}
-      {% endwith %}
-    </td>
   </tr>
   </tbody>
 </table>
@@ -61,13 +50,13 @@
     <thead>
       <tr>
         <th class="wide">
-          {% trans "Item" context "Order table header" %}
+          Товар
         </th>
         <th>
-          {% trans "SKU" context "Order table header" %}
+          Артикул
         </th>
         <th class="right-align">
-          {% trans "Quantity" context "Order table header" %}
+          Кол-во
         </th>
       </tr>
     </thead>

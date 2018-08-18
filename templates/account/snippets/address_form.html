@@ -6,9 +6,11 @@
       {% for line in address_form_lines %}
         <div class="row">
           {% for field in line %}
+          {% if field.name != 'company_name' %}
             <div class="col-6">
               {% bootstrap_field field %}
             </div>
+          {% endif %}
           {% endfor %}
         </div>
       {% endfor %}

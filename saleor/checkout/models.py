@@ -75,7 +75,7 @@ class Cart(models.Model):
 
     def is_shipping_required(self):
         """Return `True` if any of the lines requires shipping."""
-        return any(line.is_shipping_required() for line in self)
+        return False
 
     def get_shipping_price(self, taxes):
         return (
@@ -115,7 +115,7 @@ class CartLine(models.Model):
     quantity = models.PositiveIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(999)])
     data = JSONField(blank=True, default={})
-
+    complectation = models.TextField(null=True, blank=True)
     class Meta:
         unique_together = ('cart', 'variant', 'data')
 

@@ -44,7 +44,6 @@ class VariantChoiceField(forms.ModelChoiceField):
 
 class ProductForm(AddToCartForm):
     variant = VariantChoiceField(queryset=None)
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         variant_field = self.fields['variant']

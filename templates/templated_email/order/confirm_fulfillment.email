@@ -2,19 +2,19 @@
 
 {% block subject %}
   {% blocktrans trimmed with order=fulfillment.order context "Fulfillment confirmation email subject" %}
-    A shipment from order {{ order }} is on the way
+    Ваш заказ {{ order }} в пути
   {% endblocktrans %}
 {% endblock %}
 
 {% block plain %}
 {% blocktrans context "Fulfillment confirmation email text" %}
-Hi!
+Здравствуйте!
 
-Thank you for your order. Below is the list of shipped products.
+Товары из вашего заказа в пути. Ниже список товаров, которые были отправлены.
 {% endblocktrans %}
 {% if fulfillment.tracking_number %}
 {% blocktrans trimmed with tracking_number=fulfillment.tracking_number context "Fulfillment confirmation email text" %}
-You can track your shipment with {{ tracking_number }} code.
+Вы можете отследить вашу посылку с помощью кода {{ tracking_number }}.
 {% endblocktrans %}
 {% endif %}
 
@@ -23,9 +23,9 @@ You can track your shipment with {{ tracking_number }} code.
 {% endfor %}
 
 {% blocktrans context "Fulfillment confirmation email text" %}
-This is an automatically generated email, please do not reply.
+Это автоматически созданное сообщение, пожалуйста, не отвечайте на него.
 
-Sincerely,
+Ваш,
 {{ site_name }}
 {% endblocktrans %}
 {% endblock %}

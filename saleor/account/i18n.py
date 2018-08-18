@@ -78,14 +78,10 @@ class AddressForm(forms.ModelForm):
     AUTOCOMPLETE_MAPPING = [
         ('first_name', 'given-name'),
         ('last_name', 'family-name'),
-        ('company_name', 'organization'),
         ('street_address_1', 'address-line1'),
-        ('street_address_2', 'address-line2'),
         ('city', 'address-level2'),
         ('postal_code', 'postal-code'),
-        ('country_area', 'address-level1'),
         ('country', 'country'),
-        ('city_area', 'address-level3'),
         ('phone', 'tel'),
         ('email', 'email')]
 
@@ -98,23 +94,21 @@ class AddressForm(forms.ModelForm):
             'last_name': pgettext_lazy(
                 'Personal name', 'Фамилия'),
             'company_name': pgettext_lazy(
-                'Company or organization', 'Company or organization'),
+                'Company name', 'Компания'),
             'street_address_1': pgettext_lazy(
-                'Address', 'Address'),
+                'Address', 'Улица, дом'),
             'street_address_2': pgettext_lazy(
-                'Address', 'Address'),
+                'Address', 'Квартира'),
             'city': pgettext_lazy(
-                'City', 'City'),
+                'City', 'Город'),
             'city_area': pgettext_lazy(
-                'City area', 'District'),
+                'City area', 'Район'),
             'postal_code': pgettext_lazy(
-                'Postal code', 'Postal code'),
+                'Postal code', 'Почтовый индекс'),
             'country': pgettext_lazy(
                 'Country', 'Страна'),
-            'country_area': pgettext_lazy(
-                'Country area', 'State or province'),
             'phone': pgettext_lazy(
-                'Phone number', 'Phone number')}
+                'Phone number', 'Номер телефона')}
 
     phone = PossiblePhoneNumberFormField(
         widget=PhonePrefixWidget, required=True)

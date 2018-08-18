@@ -1,0 +1,177 @@
+{% extends "dashboard/base.html" %}
+{% load babel %}
+{% load i18n %}
+{% load i18n_address_tags %}
+{% load materializecss %}
+{% load price from taxed_prices %}
+{% load staticfiles %}
+{% load status %}
+{% load voucher %}
+
+{% block title %}
+  #{{ order.pk }} - {% trans "Orders" context "Dashboard orders list" %} - {{ block.super }}
+{% endblock %}
+
+{% block body_class %}body-orders{% endblock %}
+
+{% block menu_suplierorders_class %}active{% endblock %}
+
+{% block header_menu %}
+  {% url "dashboard:suplierorders" as url %}
+  {% include "dashboard/includes/_back_link.html" with url=url %}
+{% endblock %}
+
+{% block header_extra %}
+  <a class="dropdown-button right" href="#" data-activates="context-menu" data-constrainwidth="false">
+    <svg data-src="{% static "dashboard/images/more-vert.svg" %}" height="24" width="24" />
+  </a>
+  <ul id="context-menu" class="dropdown-content">
+  </ul>
+{% endblock %}
+
+{% block breadcrumbs %}
+  <ul class="breadcrumbs breadcrumbs--history">
+    <li>
+      <a href="{% url "dashboard:suplierorders" %}">
+        Заказы поставщикам
+      </a>
+    </li>
+    <li class="back-mobile">
+      <a href="{% url "dashboard:suplierorders" %}">
+        <svg data-src="{% static "dashboard/images/arrow-left.svg" %}" fill="#fff" width="20px" height="20px" />
+      </a>
+    </li>
+    <li>
+      <span>
+        {{ order.pk }} ( {{order.suplier}} )
+      </span>
+    </li>
+  </ul>
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col s12">
+      <ul class="tabs" role="tablist">
+        <li role="presentation" class="tab col s4">
+          <a href="#order-details" role="tab" class="active">
+            <span>
+              {% trans "Details" context "Order detail tab" %}
+            </span>
+            <svg data-src="{% static "dashboard/images/description.svg" %}" class="fill-secondary" />
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="row tab-content" id="order-details">
+    <div class="col s12 l4 switch-two-columns">
+    </div>
+    <div class="col s12 l8 switch-two-columns">
+      <div class="card shipment-table">
+        <div class="data-table-header">
+          <div class="data-table-title">
+            <h5>
+              {% if order.is_draft %}
+                {% blocktrans trimmed with order=order.id context "Order table title"  %}
+                  Order draft #{{ order }}
+                {% endblocktrans %}
+              {% else %}
+                {% blocktrans trimmed with order=order.id context "Order table title"  %}
+                  Order #{{ order }}
+                {% endblocktrans %}
+              {% endif %}
+            </h5>
+            <h6>
+              Поставщик: {{order.suplier.name}}
+            </h6>
+          </div>
+          {% render_order_status order.status  %}
+        </div>
+        <div class="data-table-container">
+          <table class="bordered highlight responsive data-table">
+            <thead>
+              <tr>
+                <th class="wide">
+                  {% trans "Item" context "Order table header" %}
+                </th>                
+                <th class="right-align">
+                  Заказ
+                </th>
+                <th class="right-align">
+                  {% trans "Price" context "Order table header" %}
+                </th>
+                <th class="right-align">
+                  {% trans "Quantity" context "Order table header" %}
+                </th>
+                <th class="right-align">
+                  Итого
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for line in lines %}
+                <tr class="last-no-border">
+                  <td>
+                    {% if line.variant.product %}
+                      <a href="{% url 'dashboard:product-details' pk=line.variant.product.pk %}">{{ line.variant.product.name }}</a>
+                    {% else %}
+                      {{ line.variant.product_name }}
+                    {% endif %}
+                    <br>
+                    <span class="grey-text">
+                      {% blocktrans trimmed with sku=line.product_sku context "Order table text" %}
+                        SKU: {{ sku }}
+                      {% endblocktrans %}
+                    </span>
+                  </td>
+                  <td class="right-align">
+                    <a href="{% url 'dashboard:order-details' order_pk=line.order.pk %}">{{ line.order.pk }}</a>
+                  </td>
+                  <td class="right-align">
+                    {% price line.unit_price %}
+                  </td>
+                  <td class="right-align">
+                    {% if perms.order.edit_order and order.is_draft %}
+                      <a class="dropdown-button" href="#" data-activates="line-actions-{{ line.pk }}" data-constrainwidth="false">
+                        {{ line.quantity }}
+                        <svg data-src="{% static "dashboard/images/arrow-drop-down.svg" %}" width="24" height="24" />
+                      </a>
+                      <ul id="line-actions-{{ line.pk }}" class="dropdown-content">
+                        <li>
+                          <a href="#base-modal" data-href="{% url 'dashboard:orderline-change-quantity' order_pk=order.pk line_pk=line.pk %}" class="modal-trigger-custom" title="{% trans "Change quantity" context "Order table row action" %}">
+                            {% trans "Change quantity" context "Order table row action" %}
+                          </a>
+                        </li>
+                        <li>
+                          <a href="#base-modal" data-href="{% url 'dashboard:orderline-cancel' order_pk=order.pk line_pk=line.pk %}" class="modal-trigger-custom" title="{% trans "Remove line" context "Order table row action" %}">
+                            {% trans "Remove line" context "Order table row action" %}
+                          </a>
+                        </li>
+                      </ul>
+                    {% else %}
+                      {{ line.quantity }}
+                    {% endif %}
+                  </td>
+                  <td class="right-align">
+                    {% price line.get_total %}
+                  </td>
+                </tr>
+              {% endfor %}
+              <tr class="last-no-border">
+                <td class="right-align" colspan="3">
+                  
+                  <p><strong>{% trans "Grand total" context "Order totals header" %}</strong></p>
+                </td>
+                <td class="right-align">
+                  <p><strong>{% price order.total_net %}</strong></p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+{% endblock %}

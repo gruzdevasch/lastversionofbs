@@ -1,0 +1,25 @@
+{% load i18n %}
+
+
+
+{% block plain %}
+{% blocktrans context "Account delete reset e-mail text" %}
+Здравствуйте!
+
+Вы получили это письмо, потому что зарегистрировались на {{ domain }}.
+Нажмите на ссылку ниже для того, чтобы подтвердить свой аккаунт.
+{% endblocktrans %}
+
+https://{{ domain }}{% url 'account:account-create-confirmation' uidb64=uid token=token %}
+
+Это автоматически созданное сообщение, пожалуйста, не отвечайте на него.
+
+{% blocktrans context "Account delete reset e-mail text" %}
+Ваш,
+{{ site_name }}
+{% endblocktrans %}
+{% endblock %}
+
+{% block html %}
+{% include 'templated_email/compiled/account_create.html' %}
+{% endblock %}

@@ -41,13 +41,13 @@
             <table class="bordered highlight responsive data-table">
               <thead>
                 <tr>
-                  {% trans "Name" context "Staff members table header" as label %}
+                  {% trans "Имя" context "Staff members table header" as label %}
                   {% sorting_header 'name' label %}
 
                   {% trans "Email" context "Staff members table header" as label %}
                   {% sorting_header 'email' label %}
 
-                  {% trans "Location" context "Staff members table header" as label %}
+                  {% trans "Телефон" context "Staff members table header" as label %}
                   {% sorting_header 'location' label %}
                 </tr>
               </thead>
@@ -56,8 +56,8 @@
                   <tr data-action-go="{% url "dashboard:staff-details" pk=user.pk %}">
                     {% with user.default_billing_address as default_address %}
                       <td>
-                        {% if default_address %}
-                          {{ default_address.first_name }} {{ default_address.last_name }}
+                        {% if user.first_name and user.last_name %}
+                          {{ user.first_name }} {{ user.last_name }}
                         {% else %}
                           -
                         {% endif %}
@@ -66,8 +66,8 @@
                         {{ user.email }}
                       </td>
                       <td>
-                        {% if default_address %}
-                          {{ default_address.city }}, {{ default_address.get_country_display }}
+                        {% if user.phone %}
+                          {{ user.phone }}
                         {% else %}
                           -
                         {% endif %}

@@ -8,7 +8,7 @@ register = template.Library()
 
 @register.inclusion_tag('product/_price_range.html', takes_context=True)
 def price_range(context, price_range):
-    display_gross = context['site'].settings.display_gross_prices
+    display_gross = True
     return {'display_gross': display_gross, 'price_range': price_range}
 
 
@@ -26,7 +26,7 @@ def tax_rate(taxes, rate_name):
 def price(context, base, display_gross=None, html=True):
     if isinstance(base, (TaxedMoney, TaxedMoneyRange)):
         if display_gross is None:
-            display_gross = context['site'].settings.display_gross_prices
+            display_gross = True
 
         if isinstance(base, TaxedMoneyRange):
             if display_gross:

@@ -52,7 +52,7 @@
                 {% for pk, name, values in attributes %}
                   <tr data-action-go="{% url 'dashboard:product-attribute-details' pk=pk %}">
                     <td>
-                      {{ name }}
+                      #{{pk}} {{ name }}
                     </td>
                     <td>
                       {% if values %}{{ values|join:", " }}{% else %}-{% endif %}

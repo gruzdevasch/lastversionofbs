@@ -34,9 +34,8 @@ class AddToCartForm(forms.Form):
 
     The save method adds it to the cart.
     """
-
     quantity = QuantityField(
-        label=pgettext_lazy('Add to cart form field label', 'Quantity'))
+        label=pgettext_lazy('Add to cart form field label', 'Количество'))
     error_messages = {
         'not-available': pgettext_lazy(
             'Add to cart form error',

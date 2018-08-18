@@ -59,7 +59,7 @@
                 {% for node in categories %}
                   <tr data-action-go="{% url 'dashboard:category-details' pk=node.pk %}">
                     <td>
-                      {{ node.name }}
+                      #{{node.pk}} {{ node.name }}
                     </td>
                     <td class="nowrap">
                       {% if node.description %}

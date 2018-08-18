@@ -12,7 +12,9 @@ class OrderAppConfig(AppConfig):
 
 
 class OrderStatus:
-    DRAFT = 'draft'
+    DRAFT = 'draft'    
+    DELIVERED = 'delivered'
+    PAID = 'paid'
     UNFULFILLED = 'unfulfilled'
     PARTIALLY_FULFILLED = 'partially fulfilled'
     FULFILLED = 'fulfilled'
@@ -23,18 +25,24 @@ class OrderStatus:
             'Status for a fully editable, not confirmed order created by '
             'staff users',
             'Draft')),
+        (PAID, pgettext_lazy(
+            'Status for an order with any items marked as fulfilled',
+            'В обработке')),
+        (DELIVERED, pgettext_lazy(
+            'Status for an order with any items marked as fulfilled',
+            'Доставлен')),
         (UNFULFILLED, pgettext_lazy(
             'Status for an order with any items marked as fulfilled',
-            'Не доставлено')),
+            'Не обработан')),
         (PARTIALLY_FULFILLED, pgettext_lazy(
             'Status for an order with some items marked as fulfilled',
-            'Частично доставлено')),
+            'Частично обработан')),
         (FULFILLED, pgettext_lazy(
             'Status for an order with all items marked as fulfilled',
-            'Доставлено')),
+            'Обработан')),
         (CANCELED, pgettext_lazy(
             'Status for a permanently canceled order',
-            'Отменено'))]
+            'Отменен'))]
 
 class SuplierOrderStatus:
     CURRENT = 'current'
@@ -60,15 +68,15 @@ class FulfillmentStatus:
     CHOICES = [
         (FULFILLED, pgettext_lazy(
             'Status for a group of products in an order marked as fulfilled',
-            'Fulfilled')),
+            'Обработан')),
         (CANCELED, pgettext_lazy(
             'Status for a fulfilled group of products in an order marked '
             'as canceled',
-            'Canceled'))]
+            'Отменен'))]
 
 
 class CustomPaymentChoices:
     MANUAL = 'manual'
 
     CHOICES = [
-        (MANUAL, pgettext_lazy('Custom payment choice type', 'Manual'))]
+        (MANUAL, pgettext_lazy('Custom payment choice type', 'Стандартный'))]

@@ -8,15 +8,20 @@ from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import pgettext, ugettext_lazy as _
 from django.views.decorators.http import require_POST
-
+from .tokens import account_activation_token
 from ..checkout.utils import find_and_assign_anonymous_cart
 from ..core.utils import get_paginator_items
-from .emails import send_account_delete_confirmation_email
+from .emails import send_account_delete_confirmation_email, send_account_create_confirmation_email
 from .forms import (
     ChangePasswordForm, LoginForm, PasswordResetForm, SignupForm,
-    get_address_form, logout_on_password_change)
-
-
+    get_address_form, logout_on_password_change, CustomerForm)
+from django.template.loader import render_to_string
+from django.template import RequestContext
+from django.core.mail import EmailMessage
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.contrib.sites.models import Site
+from .models import User
 @find_and_assign_anonymous_cart()
 def login(request):
     kwargs = {
@@ -28,7 +33,7 @@ def login(request):
 @login_required
 def logout(request):
     auth.logout(request)
-    messages.success(request, _('You have been successfully logged out.'))
+    messages.success(request, _('Вы успешно вышли.'))
     return redirect(settings.LOGIN_REDIRECT_URL)
 
 
@@ -38,15 +43,53 @@ def signup(request):
         form.save()
         password = form.cleaned_data.get('password')
         email = form.cleaned_data.get('email')
-        user = auth.authenticate(
-            request=request, email=email, password=password)
-        if user:
-            auth.login(request, user)
-        messages.success(request, _('User has been created'))
-        redirect_url = request.POST.get('next', settings.LOGIN_REDIRECT_URL)
-        return redirect(redirect_url)
+        user = auth.authenticate(request=request, email=email, password=password)
+        user.is_active = False
+        user.save()
+        
+        site = Site.objects.get_current()
+        mail_subject = 'Активируйте ваш аккаунт на BlitzShop'
+        message = render_to_string('templated_email/compiled/account_create.html', {
+                'domain': site.domain,
+                'site_name': site.name,
+                'uid':urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+                'token':account_activation_token.make_token(user),
+            })
+        to_email = email
+        
+        email = EmailMessage(mail_subject, message, to=[to_email])
+        email.content_subtype = "html"
+        email.send()
+        """send_account_create_confirmation_email.delay(
+            account_activation_token.make_token(user), 
+            user.email, urlsafe_base64_encode(force_bytes(user.pk)).decode())"""
+        messages.success(
+            request, pgettext(
+                'Storefront message, when user requested his account removed',
+                'Проверьте свою почту для подтверждения аккаунта.'))
+        return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
     ctx = {'form': form}
     return TemplateResponse(request, 'account/signup.html', ctx)
+
+def account_create_confirm(request, uidb64, token):
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except(User.DoesNotExist):
+        user = None
+
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True;
+        user.save()
+        
+        auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+        msg = pgettext(
+            'Ваш аккаунт был успешно подтвержден. ',
+            'Ваш аккаунт был успешно подтвержден. В случае каких-либо вопросов свяжитесь с нами.')
+        messages.success(request, msg)
+        return redirect('/')
+    return TemplateResponse(
+        request, 'account/signup.html')
 
 
 def password_reset(request):
@@ -92,13 +135,13 @@ def get_or_process_password_form(request):
         form.save()
         logout_on_password_change(request, form.user)
         messages.success(request, pgettext(
-            'Storefront message', 'Password successfully changed.'))
+            'Storefront message', 'Пароль успешно изменен.'))
     return form
 
 
 @login_required
 def address_edit(request, pk):
-    address = get_object_or_404(request.user.addresses, pk=pk)
+    """address = get_object_or_404(request.user.addresses, pk=pk)
     address_form, preview = get_address_form(
         request.POST or None, instance=address,
         country_code=address.country.code)
@@ -110,8 +153,18 @@ def address_edit(request, pk):
         return HttpResponseRedirect(reverse('account:details') + '#addresses')
     return TemplateResponse(
         request, 'account/address_edit.html',
-        {'address_form': address_form})
+        {'address_form': address_form})"""
 
+    customer = get_object_or_404(User, pk=pk)
+    form = CustomerForm(request.POST or None, instance=customer)
+    if form.is_valid():
+        form.save()
+        msg = pgettext(
+            'Dashboard message', 'Ваши данные успешно обновлены.') 
+        messages.success(request, msg)
+        return HttpResponseRedirect(reverse('account:details') + '#addresses')
+    ctx = {'form': form, 'customer': customer}
+    return TemplateResponse(request, 'account/address_edit.html', ctx)
 
 @login_required
 def address_delete(request, pk):
@@ -130,7 +183,7 @@ def address_delete(request, pk):
 @require_POST
 def account_delete(request):
     user = request.user
-    send_account_delete_confirmation_email.delay(str(user.token), user.email)
+    send_account_delete_confirmation_email(str(user.token), user.email)
     messages.success(
         request, pgettext(
             'Storefront message, when user requested his account removed',

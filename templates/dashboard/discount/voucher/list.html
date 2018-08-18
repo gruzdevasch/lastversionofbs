@@ -67,7 +67,7 @@
               </thead>
               {% for voucher in vouchers %}
                 <tbody>
-                  <tr data-action-go="{% if perms.voucher.edit_voucher %}{% url 'dashboard:voucher-update' pk=voucher.pk %}{% endif %}">
+                  <tr data-action-go="{% url 'dashboard:voucher-update' pk=voucher.pk %}">
                     <td>
                       {{ voucher }}
                     </td>

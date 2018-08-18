@@ -1,25 +1,25 @@
 {% load i18n %}
 
 {% block subject %}
-  {% trans "Delete your account" context "Account delete reset e-mail subject" %}
+  {% trans "Удаление аккаунта" context "Account delete reset e-mail subject" %}
 {% endblock %}
 
 {% block plain %}
 {% blocktrans context "Account delete reset e-mail text" %}
-Hi!
+Здравствуйте!
 
-You're receiving this e-mail because you or someone else has requested a deletion of your user account at {{ domain }}.
-Click the link below to delete your account.
+Вы получили это письмо, потому что вы или кто-то еще запросили удаление вашего аккаунта на {{ domain }}.
+Нажмите на ссылку ниже для удаления аккаунта.
 
-Please note that this action is permanent and cannot be reversed.
+Обратите внимание на то, что данное действие не обратимо.
 {% endblocktrans %}
 
 {{ url }}
 
-This is an automatically generated email, please do not reply.
+Это автоматически созданное сообщение, пожалуйста, не отвечайте на него.
 
 {% blocktrans context "Account delete reset e-mail text" %}
-Sincerely,
+Ваш,
 {{ site_name }}
 {% endblocktrans %}
 {% endblock %}

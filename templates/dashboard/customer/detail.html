@@ -44,11 +44,17 @@
           <span class="card-title">
             {{ customer.email }}
           </span>
+          <span class="card-title">
+            {{ customer.first_name }} {{ customer.last_name }}
+          </span>
+          <span class="card-title">
+            {{ customer.phone }}
+          </span>
           <div class="row">
             {% if customer.date_joined %}
               <div class="col s12 m4 l12">
                 <h4>
-                  {% trans "Date joined" context "Customer field" %}
+                  Дата регистрации
                 </h4>
                 <p>
                   {{ customer.date_joined }}
@@ -72,15 +78,15 @@
         <div class="card-action">
           {% if perms.account.edit_user %}
             <a href="{% url 'dashboard:customer-update' customer.pk %}" class="btn-flat waves-effect">
-              {% trans "Edit customer" context "Customer action" %}
+              Изменить
             </a>
             <a href="#base-modal" data-href="{% url 'dashboard:customer-delete' pk=customer.pk %}" class="modal-trigger-custom btn-flat waves-effect">
-              {% trans "Remove customer" context "Customer action" %}
+              Удалить
             </a>
           {% endif %}
           {% if perms.account.impersonate_user %}
             <a href="{% url 'impersonate-start' uid=customer.pk %}" class="btn-flat waves-effect">
-              {% trans 'Impersonate customer' context 'Customer impersonate action' %}
+              Зайти на сайт от лица этого пользователя
             </a>
           {% endif %}
         </div>
@@ -89,7 +95,7 @@
       <div class="card">
         <div class="data-table-header{% if not customer_orders %} data-table-header--no-data{% endif %}">
           <h5 class="data-table-title {% if not customer_orders %} data-table-title--no-data{% endif %}">
-            {% trans "Recent orders" context "Customer recent orders table title" %}
+            Заказы пользователя
           </h5>
         </div>
         {% if customer_orders %}
@@ -134,7 +140,7 @@
         {% else %}
           <div class="card-content card-content--no-data">
             <p>
-              {% trans "No orders found." context "Empty customer orders table message" %}
+              Нет заказов.
             </p>
           </div>
         {% endif %}
@@ -143,7 +149,7 @@
       <div class="card">
         <div class="card-content">
           <span class="card-title">
-            {% trans "Customer notes" context "Customer notes card title" %}
+            Пометки о пользователе
           </span>
           {% if notes %}
             <ul class="list">
@@ -177,40 +183,22 @@
           <div class="card equal-height-on-med">
             <div class="card-content">
               <span class="card-title black-text">
-                {% trans "Default shipping address" context "Customer default shipping address card title" %}
+               Связь
               </span>
-              {% if customer.default_shipping_address %}
-                {% with customer.default_shipping_address as address %}
-                  {% include 'dashboard/includes/_address.html' with address=address only %}
-                {% endwith %}
-              {% else %}
-                <div>{% trans "No default shipping address." context "Customer without default shipping address message" %}</div>
-              {% endif %}
               <svg data-src="{% static "dashboard/images/email.svg" %}" width="14" height="14" />
               <a href="mailto:{{ customer.email }}">
                 {{ customer.email }}
               </a>
-            </div>
-          </div>
-        </div>
-        <div class="col s12 m6 p6 l12">
-          <div class="card equal-height-on-med">
-            <div class="card-content">
-              <span class="card-title black-text">
-                {% trans "Default billing address" context "Customer default billing address card title" %}
-              </span>
-              {% if customer.default_billing_address %}
-                {% with customer.default_billing_address as address %}
-                  {% include 'dashboard/includes/_address.html' with address=address only %}
-                {% endwith %}
-              {% else %}
-                <div>
-                  {% trans "No default billing address." context "Customer without default billing address message" %}
-                </div>
+              </br>
+              <span>Тел.: {{customer.phone}}</span>
+              {% if customer.delivery_address %}
+              </br>
+              <span>Адрес: {{customer.delivery_address}}</span>
               {% endif %}
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>

@@ -6,7 +6,7 @@ from django.db.models import Q, Sum
 from django.template.response import TemplateResponse
 from payments import PaymentStatus
 
-from ..order.models import Order, Payment
+from ..order.models import Order, Payment, SuplierOrder
 from ..product.models import Product
 
 
@@ -35,13 +35,15 @@ def index(request):
     paginate_by = 10
     orders_to_ship = Order.objects.to_ship().select_related(
         'user').prefetch_related('lines', 'payments')
+    suporders = SuplierOrder.objects.all().order_by('-total_net')
     payments = Payment.objects.filter(
         status=PaymentStatus.PREAUTH).order_by('-created')
     payments = payments.select_related('order', 'order__user')
     low_stock = get_low_stock_products()
     ctx = {'preauthorized_payments': payments[:paginate_by],
            'orders_to_ship': orders_to_ship[:paginate_by],
-           'low_stock': low_stock[:paginate_by]}
+           'low_stock': low_stock[:paginate_by],
+           'suporders': suporders[:paginate_by]}
     return TemplateResponse(request, 'dashboard/index.html', ctx)
 
 

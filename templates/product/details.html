@@ -43,7 +43,7 @@
   <ul class="breadcrumbs list-unstyled">
     <li>
       <a href="{% url 'home' %}">
-        {% trans "Home" context "Main navigation item" %}
+        Главная
       </a>
     </li>
     {% if product.category %}
@@ -61,8 +61,8 @@
   {% if not is_visible %}
     <div class="alert alert-warning" role="alert">
       {% blocktrans trimmed with date=product.available_on|date context "Product details text" %}
-        <strong>Warning!</strong>
-        You are previewing a product that will become visible on <strong>{{ date }}</strong>.
+        <strong>Внимание!</strong>
+        Этот товар станет доступен <strong>{{ date }}</strong>.
       {% endblocktrans %}
     </div>
   {% endif %}
@@ -174,10 +174,12 @@
 
               <div class="form-group product__info__button">
                 <button class="btn primary">
-                  {% trans "Add to cart" context "Product details primary action" %}
+                  Добавить в корзину
                 </button>
-              </div>
+                
+              </div>      
             </form>
+              
           {% endif %}
         {% endblock %}
         <div class="product__info__form-error">
@@ -186,14 +188,30 @@
 
       {% else %}
         <p class="alert alert-warning">
-          {% blocktrans context "Product details text" %}This product is currently <strong>unavailable</strong>.{% endblocktrans %}
+          {% blocktrans context "Product details text" %}На текущий момент этот товар <strong>недоступен</strong>.{% endblocktrans %}
         </p>
+      {% endif %}
+      {% if product.complectation %}
+      </br>
+      <div class="product__info__description">
+        <h3>Комплектация<small> (указывается в корзине)</small></h3>
+        <hr>
+        {{ product.complectation|safe|linebreaks }}
+      </div>
       {% endif %}
       <div class="product__info__description">
         <h3>{% trans "Description" context "Product details title" %}</h3>
         <hr>
         {{ product.description|safe }}
       </div>
+      {% if product.techdescription %}
+      </br>
+      <div class="product__info__description">
+        <h3>Характеристики</h3>
+        <hr>
+        {{ product.techdescription|safe|linebreaks }}
+      </div>
+      {% endif %}
       <hr>
       <table>
         {% for attribute, value in product_attributes.items %}

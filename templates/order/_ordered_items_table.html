@@ -5,26 +5,6 @@
 {% load price from taxed_prices %}
 {% load product_first_image from product_images %}
 
-{% if order.user == user %}
-  <div class="order-details__addresses">
-    <div class="row">
-      {% if order.is_shipping_required %}
-        <div class="col-6">
-          <h3>
-            {% trans "Shipping address" context "Order details address title" %}
-          </h3>
-          {% format_address order.shipping_address %}
-        </div>
-      {% endif %}
-      <div class="col-6">
-        <h3>
-          {% trans "Billing address" context "Order details address title" %}
-        </h3>
-        {% format_address order.billing_address %}
-      </div>
-    </div>
-  </div>
-{% endif %}
 <div class="table__header order-details__table-header d-none d-sm-block">
   <div class="row">
     <div class="col-md-8">
@@ -121,28 +101,12 @@
 </div>
 {% endif %}
 
-<div class="table__row">
-  <div class="row">
-    <div class="col-8 order-details__table-footer">
-      <p>
-        {% if order.display_gross_prices %}
-          {% trans "Taxes (included)" context "Order details taxes text" %}
-        {% else %}
-          {% trans "Taxes" context "Order details taxes text" %}
-        {% endif %}
-      </p>
-    </div>
-    <div class="col-4">
-      <p class="float-right">{% price order.total.tax %}</p>
-    </div>
-  </div>
-</div>
 
 <div class="order-details__total">
   <div class="row">
     <div class="col-8 order-details__table-footer">
       <div class="total">
-        <h3>{% trans "Total" context "Order details total text" %}</h3>
+        <h3>Итого</h3>
       </div>
     </div>
     <div class="col-4">
@@ -157,7 +121,7 @@
 {% for fulfillment in fulfillments %}
   <h2 class="order-details__header">
     {% blocktrans trimmed with fulfillment=fulfillment.composed_id context "Order details fulfillment title" %}
-      Fulfillment #{{ fulfillment }}
+      Посылка #{{ fulfillment }}
     {% endblocktrans %}
   </h2>
 
@@ -165,12 +129,12 @@
     <div class="row">
       <div class="col-md-9">
         <small>
-          {% trans "Product" context "Order details column title" %}
+          Товар
         </small>
       </div>
       <div class="col-md-3 text-right">
         <small>
-          {% trans "Quantity" context "Order details column title" %}
+          Количество
         </small>
       </div>
     </div>
@@ -193,7 +157,7 @@
     <div class="order-details__total">
       <div class="row">
         <div class="col-4 order-details__table-footer">
-          <p>{% trans "Tracking number" context "Fulfillment tracking number details" %}</p>
+          <p>Номер отслеживания</p>
         </div>
         <div class="col-8">
           <p class="float-right">{{ fulfillment.tracking_number }}</p>

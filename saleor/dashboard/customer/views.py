@@ -76,7 +76,7 @@ def customer_edit(request, pk=None):
     if form.is_valid():
         form.save()
         msg = pgettext_lazy(
-            'Dashboard message', 'Updated customer %s') % customer
+            'Dashboard message', 'Обновлен клиент %s') % customer
         messages.success(request, msg)
         return redirect('dashboard:customer-details', pk=customer.pk)
     ctx = {'form': form, 'customer': customer}

@@ -3,7 +3,7 @@
 {% load i18n %}
 {% load price from taxed_prices %}
 {% load staticfiles %}
-
+{% load bootstrap_form from bootstrap4 %}
 {% block title %}{% trans "Checkout" context "Checkout page title" %} — {{ block.super }}{% endblock %}
 
 {% block header %}
@@ -27,9 +27,29 @@
 
 {% block content %}
   <div class="row checkout">
-    <!-- <div class="col-md-7">
+    <div class="col-md-7">
+      <div class="row">
+        <div class="col-md-6 ">
+          <div class="shadow-sm card bg-light mb-3" style="max-width: 18rem;">
+  
+            <div class="card-body">
+    <h5 class="card-title">Комментарий</h5>
+    <p class="card-text">В поле "Комментарий к заказу" можно указать, необходимую комплектацию товара, либо ваши пожелания к заказу.</p>
+            </div>
+          </div>
+        </div> 
+    <div class="col-md-6 ">
+        <div class="shadow-sm card bg-light mb-3" style="max-width: 18rem;">
+  
+        <div class="card-body">
+    <h5 class="card-title">Доставка</h5>
+    <p class="card-text">На данный момент функция самовывоза недоступна. <br>Товар доставляется на дом. <br>Доставка бесплатна.</p>
+        </div>
+        </div>
+    </div> 
+    </div>
       {% block forms %}{% endblock %}
-    </div> -->
+    </div>
     <div class="col-md-5">
       <div class="checkout__review">
         <h3 class="checkout__review__tittle">ПРОСМОТР ЗАКАЗА</h3>
@@ -85,9 +105,34 @@
           </div>
         </div>
       </div>
-      <button type="submit" class="btn primary">
-        {% trans "Continue" context "Checkout shipping address primary action" %}
-      </button>
+      
+      </br>
+      <form method="POST" action="https://money.yandex.ru/quickpay/confirm.xml">
+        <input type="hidden" name="receiver" value="410017200913264">
+        <input type="hidden" name="formcomment" value="Оплата товара на BlitzShop.">
+        <input type="hidden" name="short-dest" value="Оплата товара на BlitzShop.">
+        <input type="hidden" name="successURL" value="https://blitzshop.ru/order/checkout-success">
+        <input type="hidden" name="label" value="Order">
+        <input type="hidden" name="quickpay-form" value="shop">
+        <input type="hidden" name="targets" value="Оплата товара на BlitzShop.">
+        <input type="hidden" name="sum" value="{{ cart_total.gross.amount }}" data-type="number">
+        <input type="hidden" name="comment" value="">
+        <input type="hidden" name="need-fio" value="false">
+        <input type="hidden" name="need-email" value="true">
+        <input type="hidden" name="need-phone" value="false">
+        {% if additional_addresses %}
+        <input type="hidden" name="need-address" value="false">
+        {% else %}
+        <input type="hidden" name="need-address" value="true">
+        {% endif %}
+        <h4>Способы оплаты:</h4><label class="btn btn-warning" type="hidden"><input  type="radio" name="paymentType" value="PC">Яндекс.Деньги</label>
+        <label class="btn active btn-success" type="hidden"><input  type="radio" name="paymentType" checked="True" value="AC">Банковская карта</label>
+        <button type="submit" class="btn primary">Перейти к оплате</button>
+        </br>
+      <small>Пожалуйста, указывайте на форме оплаты тот же email,<br> 
+      который был использован при регистрации.</small>
+      </form>
     </div>
   </div>
 {% endblock content %}
+

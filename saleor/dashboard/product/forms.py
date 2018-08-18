@@ -205,7 +205,8 @@ class ProductForm(forms.ModelForm, AttributesMixin):
         exclude = ['attributes', 'product_type', 'updated_at']
         labels = {
             'name': pgettext_lazy('Item name', 'Название'),
-            'description': pgettext_lazy('Description', 'Description'),
+            'description': pgettext_lazy('Description', 'Описание'),
+            'techdescription': pgettext_lazy('Description', 'Характеристики'),
             'seo_description': pgettext_lazy(
                 'A SEO friendly description', 'SEO Описание'),
             'category': pgettext_lazy('Category', 'Категория'),
@@ -222,7 +223,7 @@ class ProductForm(forms.ModelForm, AttributesMixin):
             'charge_taxes': pgettext_lazy(
                 'Charge taxes on product', 'Облагать налогом(лучше не трогать)'),
             'tax_rate': pgettext_lazy(
-                'Product tax rate type', 'Tax rate'),
+                'Product tax rate type', 'Налоги'),
             'suplier': pgettext_lazy(
                 'Add to collection select', 'Поставщик')}
 
@@ -230,6 +231,7 @@ class ProductForm(forms.ModelForm, AttributesMixin):
     collections = forms.ModelMultipleChoiceField(
         required=False, queryset=Collection.objects.all())
     description = RichTextField()
+    techdescription = RichTextField()
     suplier = forms.ModelChoiceField(queryset=ProductSuplier.objects.all())
 
     model_attributes_field = 'attributes'

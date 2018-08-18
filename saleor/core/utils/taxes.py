@@ -74,12 +74,12 @@ def get_tax_rate_by_name(rate_name, taxes=None):
 
 
 def include_taxes_in_prices():
-    return Site.objects.get_current().settings.include_taxes_in_prices
+    return True
 
 
 def display_gross_prices():
-    return Site.objects.get_current().settings.display_gross_prices
+    return True
 
 
 def charge_taxes_on_shipping():
-    return Site.objects.get_current().settings.charge_taxes_on_shipping
+    return False

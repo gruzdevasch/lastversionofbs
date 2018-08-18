@@ -24,7 +24,7 @@
   <ul class="breadcrumbs list-unstyled">
     <li>
       <a href="{% url 'home' %}">
-        {% trans "Home" context "Main navigation item" %}
+        Главная
       </a>
     </li>
     {% if page %}
@@ -39,8 +39,8 @@
   {% if not page.is_visible %}
     <div class="alert alert-warning" role="alert">
       {% blocktrans context "Unavailable page detail text" %}
-        <strong>Warning!</strong>
-        You are previewing a page that is not visible.
+        <strong>Внимание!</strong>
+        Данная страница на текущий момент не доступна.
       {% endblocktrans %}
     </div>
   {% elif not is_visible %}
@@ -52,6 +52,6 @@
     </div>
   {% endif %}
   <div class="">
-    {{ page.content|safe }}
+    {{ page.content |safe}}
   </div>
 {% endblock %}

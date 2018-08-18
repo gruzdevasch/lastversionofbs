@@ -56,7 +56,7 @@
               {% for pk, name, product_attributes, variant_attributes in product_types %}
                 <tr data-action-go="{% if perms.product.edit_properties %}{% url 'dashboard:product-type-update' pk=pk %}{% endif %}">
                   <td>
-                    {{ name }}
+                    #{{pk}} {{ name }}
                   </td>
                   <td>
                     {% if product_attributes %}

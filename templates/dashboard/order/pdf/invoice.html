@@ -14,7 +14,7 @@
     <img src="{% static '/images/logo-document.svg' %}">
   </div>
   <div
-      style="float:right">{{ order.created }}<br>{% trans 'Order' context 'Invoice header' %} #{{ order.id }}
+      style="float:right">{{ order.created }}<br>Заказ #{{ order.id }}
   </div>
 </header>
 
@@ -24,12 +24,7 @@
   <tr>
     {% if order.shipping_address %}
       <th align="left" width="50%">
-        {% trans "Shipping address" context "Invoice shipping address" %}
-      </th>
-    {% endif %}
-    {% if order.billing_address %}
-      <th align="left" {% if order.shipping_address %} width="50%"{% endif %}>
-        {% trans "Billing address" context "Invoice billing address" %}
+        Адрес доставки
       </th>
     {% endif %}
   </tr>
@@ -39,11 +34,6 @@
     {% if order.shipping_address %}
       <td>
         {% include 'dashboard/includes/_address.html' with address=order.shipping_address only %}
-      </td>
-    {% endif %}
-    {% if order.billing_address %}
-      <td>
-        {% include 'dashboard/includes/_address.html' with address=order.billing_address only %}
       </td>
     {% endif %}
   </tr>
@@ -61,19 +51,16 @@
         </div>
       </th>
       <th>
-        {% trans "SKU" context "Shipment order table header" %}
+        Артикул
       </th>
       <th class="right-align">
-        {% trans "Tax rate" context "Shipment order table header" %}
+        Цена
       </th>
       <th class="right-align">
-        {% trans "Gross price" context "Shipment order table header" %}
+        Кол-во
       </th>
       <th class="right-align">
-        {% trans "Quantity" context "Shipment order table header" %}
-      </th>
-      <th class="right-align">
-        {% trans "Total" context "Shipment order table header" %}
+        Всего
       </th>
     </tr>
     </thead>
@@ -85,11 +72,6 @@
           </td>
           <td>
             {{ line.product_sku }}
-          </td>
-          <td class="right-align">
-            {% blocktrans with tax_rate=line.tax_rate context "Order line tax rate value" %}
-              {{ tax_rate }} %
-            {% endblocktrans %}
           </td>
           <td class="right-align">
             {% price line.unit_price.gross %}
@@ -110,7 +92,7 @@
   <tbody>
     <tr>
       <td class="wide">
-        {% trans "Subtotal" context "Order subtotal net price" %}
+        Промежуточный итог
       </td>
       <td class="right-align">
         {% price order.get_subtotal.gross %}
@@ -118,24 +100,16 @@
     </tr>
     <tr>
       <td>
-        {% trans "Shipping" context "Order total shipping price header" %} {% if order.shipping_method_name %}({{ order.shipping_method_name }}){% endif %}
+        Доставка {% if order.shipping_method_name %}({{ order.shipping_method_name }}){% endif %}
       </td>
       <td class="right-align">
         {% price order.shipping_price.gross %}
       </td>
     </tr>
-    <tr>
-      <td>
-        {% trans "Total taxes (included)" context "Order total taxes header" %}
-      </td>
-      <td class="right-align">
-        {% price order.total.tax %}
-      </td>
-    </tr>
     {% if order.discount_amount %}
       <tr>
         <td>
-          {% trans "Discount" context "Order voucher header" %} {% if order.discount_name %}({{ order.discount_name }}){% endif %}
+          Скидка {% if order.discount_name %}({{ order.discount_name }}){% endif %}
         </td>
         <td class="right-align">
           {% discount_as_negative order.discount_amount html=True %}
@@ -146,7 +120,7 @@
   <tfoot>
     <tr>
       <td>
-        {% trans "Grand total" context "Order total price header" %}
+        Итого
       </td>
       <td class="right-align">
         {% price order.total.gross %}

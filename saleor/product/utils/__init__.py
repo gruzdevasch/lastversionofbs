@@ -12,6 +12,7 @@ from ..forms import ProductForm
 from .availability import products_with_availability
 from django.db.models import Max, Min
 from random import randint
+from ..models import Product
 
 
 def random_queryset_elements(qs, number):
@@ -33,7 +34,7 @@ def random_queryset_elements(qs, number):
 
 def products_visible_to_user(user):
     # pylint: disable=cyclic-import
-    from ..models import Product
+    
     if user.is_authenticated and user.is_active and user.is_staff:
         return Product.objects.all()
     return Product.objects.available_products()
@@ -48,9 +49,9 @@ def products_with_details(user):
 
 def products_for_homepage():
     user = AnonymousUser()
-    products = products_with_details(user)
-    products = products.filter(is_featured = True)
-    products = random_queryset_elements(products, 8)
+    #products = products_with_details(user)
+    products = Product.objects.available_products().order_by('-sold', 'name')[:8]
+    #products = random_queryset_elements(products, 8)
     return products
 
 
@@ -89,7 +90,10 @@ def get_variant_url(variant):
 
 def allocate_stock(variant, quantity):
     variant.quantity_allocated = F('quantity_allocated') + quantity
+    product = variant.product
+    product.sold = F('sold') + quantity
     variant.save(update_fields=['quantity_allocated'])
+    product.save(update_fields=['sold'])
 
 
 def deallocate_stock(variant, quantity):

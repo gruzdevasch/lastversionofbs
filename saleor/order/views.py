@@ -8,19 +8,29 @@ from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
+from django.http import HttpResponse
 from django.utils.translation import pgettext_lazy
 from django.views.decorators.csrf import csrf_exempt
 from payments import PaymentStatus, RedirectNeeded
-
+from ..checkout.models import Cart
+from ..checkout.utils import create_order, get_taxes_for_cart
+from ..order import OrderStatus, SuplierOrderStatus, CustomPaymentChoices
+from ..core import analytics
+from ..core.exceptions import InsufficientStock
+from .emails import send_order_confirmation
 from . import FulfillmentStatus
 from ..account.forms import LoginForm
-from ..account.models import User
+from ..account.models import User, Address
 from ..core.utils import get_client_ip
 from .forms import (
     OrderNoteForm, PasswordForm, PaymentDeleteForm, PaymentMethodsForm)
-from .models import Order, OrderNote, Payment
+from .models import Order, OrderNote, Payment, SuplierOrder
 from .utils import attach_order_to_user, check_order_status
-
+import hashlib
+from django.contrib.sites.models import Site
+from django.template.loader import render_to_string
+from django.template import RequestContext
+from django.core.mail import EmailMessage, EmailMultiAlternatives
 logger = logging.getLogger(__name__)
 
 
@@ -153,24 +163,135 @@ def payment_success(request, token):
     url = reverse('order:checkout-success', kwargs={'token': token})
     return redirect(url)
 
+@csrf_exempt
+def checkout_handling(request):
+    if request.method=='POST':
+        email=request.POST.get('email')
+        user = get_object_or_404(User, email=email)
+        notification_type=request.POST.get('notification_type')
+        operation_id=request.POST.get('operation_id')        
+        amount=request.POST.get('amount')
+        withdraw_amount=request.POST.get('withdraw_amount')
+        currency=request.POST.get('currency')
+        datetime=request.POST.get('datetime')
+        sender=request.POST.get('sender')
+        city = request.POST.get('city')
+        street = request.POST.get('street')
+        building = request.POST.get('building')
+        suite = request.POST.get('suite')
+        flat = request.POST.get('flat')
+        zip = request.POST.get('zip')
+        codepro=request.POST.get('codepro')
+        notification_secret=settings.YANDEX_SECRET_KEY
+        label=request.POST.get('label')
+        sha1_hash=request.POST.get('sha1_hash')
+        madesha1 = notification_type + '&' + operation_id + '&' + amount + '&' + currency + '&' + datetime + '&' + sender + '&' + codepro + '&' + notification_secret + '&' + label
+        sha1_madehash = hashlib.sha1(madesha1.encode('utf-8')).hexdigest()
+        if sha1_madehash == sha1_hash:
+            cart = Cart.objects.all().filter(user=user).first()
+            if city:
+                user.delivery_address = city
+                user.save()
+                """address = Address()
+                address.first_name = user.first_name
+                address.last_name = user.last_name
+                address.company_name = " "
+                address.street_address_1 = " "
+                address.street_address_2 = " "
+                address.city = city
+                address.city_area = " "
+                address.postal_code = " "
+                address.country = "Russian Federation"
+                address.country_area = " "
+                address.phone = user.phone
+                address.save()
+                
+                
+                user.default_billing_address = address
+                user.addresses.add(address)
+                user.save()
+                cart.billing_address = user.addresses.first()
+                cart.save()"""
+                
+            try:
+                order = create_order(
+                    cart=cart,
+                    tracking_code=analytics.get_client_id(request),
+                    discounts=request.discounts,
+                    taxes=get_taxes_for_cart(cart, request.taxes))
+            except InsufficientStock:
+                return redirect('cart:index')
+          # happens when a voucher is now invalid
+            if not order:
+                msg = pgettext('Checkout warning', 'Проверьте свою корзину(возможно истек срок действия купона).')
+                messages.warning(request, msg)
+                return redirect('cart:index')
+            cart.delete()
+            msg = pgettext_lazy('Order status history entry', 'Заказ размещен.')
+            order.history.create(user=user, content=msg)
 
-def checkout_success(request, token):
+            lines = order.lines.all()
+            for line in lines:
+                suplierorder = SuplierOrder.objects.get_or_create(status=SuplierOrderStatus.CURRENT, 
+                    suplier = line.variant.product.suplier)[0]
+                line.suplierorder = suplierorder
+                suplierorder.total_net += line.get_total()
+                suplierorder.save()
+                line.save()
+            order.status = OrderStatus.PAID
+            defaults = {
+                'total': order.total.gross.amount,
+                'tax': order.total.tax.amount,
+                'currency': order.total.currency,
+                'delivery': order.shipping_price.net.amount,
+                'description': pgettext_lazy(
+                    'Payment description', 'Order %(order)s') % {
+                        'order': order},
+                'captured_amount': order.total.gross.amount}
+            Payment.objects.get_or_create(
+                variant=CustomPaymentChoices.MANUAL,
+                status=PaymentStatus.CONFIRMED, order=order,
+                defaults=defaults)
+            msg = pgettext_lazy(
+                'Dashboard message',
+                'Заказ был оплачен')
+            order.history.create(content=msg, user=user)
+            order.save()
+            for line in lines:
+                suplierorder = line.suplierorder
+                if suplierorder.total_net.amount >= 10000:
+                    suplierorder.status = SuplierOrderStatus.READY_TO_HANDLE
+                    suplieroder.save()
+            
+            site = Site.objects.get_current()
+            mail_subject = 'Заказ на BlitzShop'
+            message = render_to_string('templated_email/compiled/confirm_order.html', {
+                    'domain': site.domain,
+                    'site_name': site.name,
+                    'order': order
+                })
+            to_email = email
+            
+            email = EmailMessage(mail_subject, message, to=[to_email])
+            email.content_subtype = "html"
+            email.send()
+    return HttpResponse(status_code =200)
+
+def checkout_fail(request):
+    return redirect ('/')
+
+def checkout_success(request):
     """Redirect user after placing an order.
-
+    
     Anonymous users are redirected to the checkout success page.
     Registered users are redirected to order details page and the order
     is attached to their account.
     """
-    order = get_object_or_404(Order, token=token)
-    lines = order.lines
-    for line in lines:
-        suplierorder = SuplierOrder.objects.get_or_create(status="CURRENT", suplier = line.variant.product.suplier)[0]
-        line.suplierorder = suplierorder
-        suplierorder.total_net += line.get_total()
-    email = order.user_email
+    email = request.user.email
+    order = Order.objects.all().filter(user_email=email).first()
+
     ctx = {'email': email, 'order': order}
-    if request.user.is_authenticated:
-        return TemplateResponse(request, 'order/checkout_success.html', ctx)
+    return TemplateResponse(request, 'order/checkout_success.html', ctx)
 
 
 @login_required

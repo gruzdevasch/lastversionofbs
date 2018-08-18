@@ -5,10 +5,20 @@ from django.contrib.auth import forms as django_forms, update_session_auth_hash
 from django.utils.translation import pgettext, pgettext_lazy
 from phonenumbers.phonenumberutil import country_code_for_region
 
+from phonenumber_field.formfields import PhoneNumberField
 from . import emails
 from ..account.models import User
 from .i18n import AddressMetaForm, get_address_form_class
+from .widgets import PhonePrefixWidget
+from .validators import validate_possible_number
 
+class PossiblePhoneNumberFormField(PhoneNumberField):
+    """A PhoneNumberField that allows phone numbers from other countries."""
+
+    default_validators = [validate_possible_number]
+
+    def to_python(self, value):
+        return value
 
 class FormWithReCaptcha(forms.BaseForm):
     def __new__(cls, *args, **kwargs):
@@ -20,8 +30,7 @@ class FormWithReCaptcha(forms.BaseForm):
         return super(FormWithReCaptcha, cls).__new__(cls)
 
 
-def get_address_form(
-        data, country_code, initial=None, instance=None, **kwargs):
+def get_address_form(data, country_code, initial=None, instance=None, **kwargs):
     country_form = AddressMetaForm(data, initial=initial)
     preview = False
     if country_form.is_valid():
@@ -77,22 +86,33 @@ class LoginForm(django_forms.AuthenticationForm, FormWithReCaptcha):
 
 
 class SignupForm(forms.ModelForm, FormWithReCaptcha):
-    password = forms.CharField(
+    password = forms.CharField(label='Пароль',
         widget=forms.PasswordInput)
     email = forms.EmailField(
         error_messages={
             'unique': pgettext_lazy(
                 'Registration error',
-                'This email has already been registered.')})
+                'Данный email уже занят.')})
+    first_name = forms.CharField(label='Имя')
+    last_name = forms.CharField(label='Фамилия')
+    phone = PossiblePhoneNumberFormField(
+        widget=PhonePrefixWidget, required=True, label='Телефон')
+    
 
     class Meta:
         model = User
-        fields = ('email',)
+        fields = ('email', 'first_name', 'last_name', 'phone')
         labels = {
             'email': pgettext_lazy(
                 'Email', 'Email'),
             'password': pgettext_lazy(
-                'Password', 'Password')}
+                'Пароль', 'Пароль'),
+            'first_name': pgettext_lazy(
+                'Имя', 'Имя'),
+            'last_name': pgettext_lazy(
+                'Фамилия', 'Фамилия'),
+            'phone': pgettext_lazy(
+                'Телефон', 'Телефон')}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -103,11 +123,29 @@ class SignupForm(forms.ModelForm, FormWithReCaptcha):
     def save(self, request=None, commit=True):
         user = super().save(commit=False)
         password = self.cleaned_data['password']
+
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        user.phone = self.cleaned_data['phone']
         user.set_password(password)
         if commit:
             user.save()
         return user
 
+class CustomerForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        # disable 'is_active' checkbox if user edits his own account
+
+    class Meta:
+        model = User
+        fields = ['first_name','last_name','phone','delivery_address']
+        labels = {
+            'first_name': pgettext_lazy('Customer note', 'Имя'),
+            'last_name': pgettext_lazy('Allo', 'Фамилия'),
+            'phone': pgettext_lazy('Allo', 'Телефон'),
+            'delivery_address': pgettext_lazy('Allo', 'Адрес доставки')}
 
 class PasswordResetForm(django_forms.PasswordResetForm, FormWithReCaptcha):
     """Allow resetting passwords.

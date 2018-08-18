@@ -69,8 +69,18 @@
             </div>
           </div>
           <p>
-            {{ product.description | safe }}
+            Продано: {{ product.sold |safe }}
           </p>
+          </br>
+          <p>
+            {{ product.description |safe }}
+          </p>
+          {% if product.techdescription %}
+          </br>
+          <p>
+            {{ product.techdescription |safe|linebreaks }}
+          </p>
+          {% endif %}
         </div>
         <div class="card-action">
           {% if perms.product.edit_product %}
@@ -105,12 +115,12 @@
                   <th>{% trans "Status" %}</th>
                   <th class="right-align">
                     {% if site.settings.include_taxes_in_prices %}
-                      {% trans "Gross price" %}
+                      Цена продажи
                     {% else %}
                       {% trans "Net price" %}
                     {% endif %}
                   </th>
-                  <th class="right-align">{% trans "Margin" %}</th>
+                  <th class="right-align">Продано</th>
                   {% if perms.product.edit_product %}
                     <th></th>
                   {% endif %}
@@ -126,14 +136,7 @@
                       {% price variant.base_price %}
                     </td>
                     <td class="right-align">
-                      {% margins_for_variant variant=variant as margins %}
-                      {% if margins|length > 1 %}
-                        {{ margins|first }}% - {{ margins|last }}%
-                      {% elif margins %}
-                        {{ margins|first }}%
-                      {% else %}
-                        -
-                      {% endif %}
+                      {{ variant.quantity_allocated }}
                     </td>
                     {% if perms.product.edit_product %}
                       <td><a href="{% url 'dashboard:variant-update' product_pk=product.pk variant_pk=variant.pk %}" class="btn-flat waves-effect">{% trans "Edit" %}</a></td>

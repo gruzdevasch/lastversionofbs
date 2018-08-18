@@ -25,7 +25,7 @@ def menu_list(request):
     menus = get_paginator_items(
         menu_filter.qs, settings.DASHBOARD_PAGINATE_BY,
         request.GET.get('page'))
-    site_settings = request.site.settings
+    site_settings = request.site
 
     data = (
         request.POST

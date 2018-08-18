@@ -4,12 +4,13 @@
 {% load price from taxed_prices %}
 {% load staticfiles %}
 
+
 {% block title %}{% trans "Your cart" context "Cart page title" %} — {{ block.super }}{% endblock %}
 
 {% block breadcrumb %}
   <ul class="breadcrumbs list-unstyled">
-    <li><a href="{% url 'home' %}">{% trans "Home" context "Main navigation item" %}</a></li>
-    <li><a rel="nofollow" href="{% url 'cart:index' %}">{% trans "Cart" context "Cart breadcrumb" %}</a></li>
+    <li><a href="{% url 'home' %}">Главная</a></li>
+    <li><a rel="nofollow" href="{% url 'cart:index' %}">Корзина</a></li>
   </ul>
 {% endblock breadcrumb %}
 
@@ -87,8 +88,9 @@
       <div class="cart__empty">
         <img class="lazyload lazypreload" data-src="{% static 'images/empty-cart-bg.png' %}" data-srcset="{% static 'images/empty-cart-bg.png' %} 1x, {% static 'images/empty-cart-bg2x.png' %} 2x">
         <h2>{% trans "В корзине пока нет товаров." context "Empty cart message" %}</h2>
-        <a href="{% url 'home' %}" class="btn primary">{% trans "Check out our sales" context "Empty cart link" %}</a>
+        <a href="{% url 'home' %}" class="btn primary">Посмотрите наши предложения</a>
       </div>
     {% endif %}
+    
   </div>
 {% endblock content %}

@@ -39,23 +39,22 @@
             <table class="bordered highlight responsive data-table">
               <thead>
                 <tr>
-                  {% trans "Name" context "Customers table header" as label %}
+                  {% trans "Имя" context "Customers table header" as label %}
                   {% sorting_header 'name' label %}
 
                   {% trans "Email" context "Customers table header" as label %}
                   {% sorting_header 'email' label %}
 
-                  {% trans "Location" context "Customers table header" as label %}
+                  {% trans "Телефон" context "Customers table header" as label %}
                   {% sorting_header 'location' label %}
                 </tr>
               </thead>
               <tbody>
                 {% for customer in customers %}
                   <tr data-action-go="{% url "dashboard:customer-details" pk=customer.pk %}">
-                    {% with customer.default_billing_address as default_address %}
                       <td>
-                        {% if default_address %}
-                          {{ default_address.first_name }} {{ default_address.last_name }}
+                        {% if customer.first_name and customer.last_name %}
+                          {{ customer.first_name }} {{ customer.last_name }}
                         {% else %}
                           -
                         {% endif %}
@@ -64,13 +63,12 @@
                         {{ customer.email }}
                       </td>
                       <td>
-                        {% if default_address %}
-                          {{ default_address.city }}, {{ default_address.get_country_display }}
+                        {% if customer.phone %}
+                          {{ customer.phone }}
                         {% else %}
                           -
                         {% endif %}
                       </td>
-                    {% endwith %}
                   </tr>
                 {% endfor %}
               </tbody>

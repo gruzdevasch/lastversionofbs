@@ -21,6 +21,7 @@ from .page.urls import urlpatterns as page_urls
 from .product.urls import urlpatterns as product_urls
 from .search.urls import urlpatterns as search_urls
 
+
 handler404 = 'saleor.core.views.handle_404'
 
 non_translatable_urlpatterns = [
@@ -50,8 +51,7 @@ translatable_urlpatterns = [
     url(r'^search/', include((search_urls, 'search'), namespace='search')),
     url(r'', include('payments.urls'))]
 
-urlpatterns = non_translatable_urlpatterns + i18n_patterns(
-    *translatable_urlpatterns)
+urlpatterns = non_translatable_urlpatterns + translatable_urlpatterns
 
 if settings.DEBUG:
     import debug_toolbar

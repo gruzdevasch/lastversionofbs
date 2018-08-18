@@ -44,7 +44,7 @@ class CustomerForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['email', 'is_active', 'note']
+        fields = ['email', 'first_name','last_name','phone','delivery_address','is_active', 'note']
 
 
 class CustomerNoteForm(forms.ModelForm):

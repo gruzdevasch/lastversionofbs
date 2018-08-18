@@ -1,0 +1,102 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% load materializecss %}
+{% load staticfiles %}
+
+{% block title %}
+  {% if suplier.pk %}
+    {{ suplier }}
+  {% else %}
+    {% trans "Новый поставщик"  context "Sale (discount) page title" %}
+  {% endif %}
+  - {% trans "Поставщики" context "Dashboard sales (discounts) list." %} - {{ block.super }}
+{% endblock %}
+
+{% block body_class %}body-sales{% endblock %}
+
+{% block menu_suplier_class %}active{% endblock %}
+
+{% block header_menu %}
+  {% url "dashboard:suplier-list" as url %}
+  {% include "dashboard/includes/_back_link.html" with url=url %}
+{% endblock %}
+
+{% block header_extra %}
+  {% if suplier.pk %}
+    <a class="dropdown-button right" href="#" data-activates="sale-delete" data-constrainwidth="false">
+      <svg data-src="{% static "dashboard/images/more-vert.svg" %}" height="24" width="24" />
+    </a>
+    <ul id="sale-delete" class="dropdown-content">
+      <li>
+        <a class="modal-trigger-custom" href="#base-modal" data-href="{% url 'dashboard:suplier-delete' pk=suplier.pk %}">
+          {% trans "Удалить постащика" context "Sale (discount) action" %}
+        </a>
+      </li>
+    </ul>
+  {% endif %}
+{% endblock %}
+
+{% block breadcrumbs %}
+  <ul class="breadcrumbs breadcrumbs--history">
+    <li>
+      <a href="{% url 'dashboard:suplier-list' %}">
+        Поставщики
+      </a>
+    </li>
+    <li class="back-mobile">
+      <a href="{% url 'dashboard:suplier-list' %}">
+        <svg data-src="{% static "dashboard/images/arrow-left.svg" %}" fill="#fff" width="20px" height="20px" />
+      </a>
+    </li>
+    <li>
+      <span class="breadcrumbs--ellipsed-item">
+        {% if suplier.pk %}
+          {{ suplier }}
+        {% else %}
+          {% trans "Новый поставщик" context "Sale (discount) breadcrumbs" %}
+        {% endif %}
+      </span>
+    </li>
+  </ul>
+{% endblock %}
+
+
+{% block content %}
+  <div class="row">
+    <div class="col m12 l9">
+      <div class="card">
+        <form method="post" enctype="multipart/form-data" id="form-sales" novalidate>
+          <div class="card-content card-content-form">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+              <blockquote>
+                {% for non_field_error in form.non_field_errors %}
+                  {{ non_field_error }}
+                {% endfor %}
+              </blockquote>
+            {% endif %}
+            <div class="row">
+              {{ form.name|materializecss }}
+            </div>
+          </div>
+
+          <div class="card-action right-align">
+            <a href="{% url 'dashboard:suplier-list' %}" class="btn-flat waves-effect">
+              Отмена
+            </a>
+            {% if suplier.pk %}
+              <button type="submit" class="btn waves-effect">
+                Обновить
+              </button>
+            {% else %}
+              <button type="submit" class="btn waves-effect">
+                Добавить
+              </button>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="col m12 l3 help-box"></div>
+  </div>
+{% endblock %}

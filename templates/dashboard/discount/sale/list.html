@@ -50,7 +50,7 @@
               </thead>
               <tbody>
                 {% for sale in sales %}
-                  <tr data-action-go="{% if perms.sale.edit_sale %}{% url 'dashboard:sale-update' pk=sale.pk %}{% endif %}">
+                  <tr data-action-go="{% url 'dashboard:sale-update' pk=sale.pk %}">
                     <td>
                       {{ sale }}
                     </td>

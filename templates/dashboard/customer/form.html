@@ -7,7 +7,7 @@
   {% if customer.pk %}
     {{ customer }}
   {% else %}
-    {% trans "Add new customer" context "Dashboard add customer" %}
+    {% trans "Добавление нового клиента" context "Dashboard add customer" %}
   {% endif %}
      - {% trans "Customer" context "Dashboard customer" %} - {{ block.super }}
 {% endblock %}
@@ -44,7 +44,7 @@
         <form class="card" method="post">
           <div class="card-content">
             <span class="card-title">
-              {% trans 'Customer details' context 'Customer details header' %}
+              Данные клиента
             </span>
             <div class="data">
               {% csrf_token %}
@@ -57,17 +57,17 @@
           <div class="card-action right-align">
             {% if customer.pk %}
               <a href="{% url 'dashboard:customer-details' pk=customer.pk %}" class="btn-flat waves-effect">
-                {% trans "Cancel" context "Dashboard cancel action" %}
+                Отмена
               </a>
               <button type="submit" class="btn waves-effect">
-                {% trans 'Update' context 'Dashboard update action' %}
+                Обновить
               </button>
             {% else %}
               <a href="{% url 'dashboard:customers' %}" class="btn-flat waves-effect">
-                {% trans "Cancel" context "Dashboard cancel action" %}
+                Отмена
               </a>
               <button type="submit" class="btn waves-effect">
-                {% trans 'Add' context 'Dashboard add action' %}
+                Добавить
               </button>
             {% endif %}
           </div>

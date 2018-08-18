@@ -96,10 +96,6 @@ class ProductQuerySet(models.QuerySet):
 
 class ProductSuplier(models.Model):
     name = models.CharField(max_length=255, blank=True)
-    curent_sum = MoneyField(
-        currency=settings.DEFAULT_CURRENCY, max_digits=12,
-        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
-        default=0)
     def __str__(self):
         return self.name
 
@@ -110,6 +106,8 @@ class Product(SeoModel):
     suplier = models.ForeignKey(
         ProductSuplier, related_name='products', on_delete=models.CASCADE, null = True)
     description = models.TextField()
+    techdescription = models.TextField(null=True, blank=True)
+    complectation = models.TextField(null=True, blank=True)
     category = models.ForeignKey(
         Category, related_name='products', on_delete=models.CASCADE)
     price = MoneyField(
@@ -123,7 +121,8 @@ class Product(SeoModel):
     charge_taxes = models.BooleanField(default=True)
     tax_rate = models.CharField(
         max_length=128, default=DEFAULT_TAX_RATE_NAME, blank=True)
-
+    sold = models.IntegerField(
+        validators=[MinValueValidator(0)], default=Decimal(0))
     objects = ProductQuerySet.as_manager()
 
     class Meta:
@@ -157,7 +156,8 @@ class Product(SeoModel):
         return reverse(
             'product:details',
             kwargs={'slug': self.get_slug(), 'product_id': self.id})
-
+      
+    
     def get_slug(self):
         return slugify(smart_text(unidecode(self.name)))
 
@@ -198,7 +198,7 @@ class ProductVariant(models.Model):
     images = models.ManyToManyField('ProductImage', through='VariantImage')
     track_inventory = models.BooleanField(default=True)
     quantity = models.IntegerField(
-        validators=[MinValueValidator(0)], default=Decimal(999999))
+        validators=[MinValueValidator(0)], default=Decimal(99999))
     quantity_allocated = models.IntegerField(
         validators=[MinValueValidator(0)], default=Decimal(0))
     cost_price = MoneyField(

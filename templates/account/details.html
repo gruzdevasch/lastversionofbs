@@ -13,10 +13,10 @@
   <ul class="breadcrumbs list-unstyled">
     <li>
       <a href="{% url 'home' %}">
-        {% trans "Home" context "Main navigation item" %}
+        Главная
       </a>
     </li>
-    <li>{% trans "Your account" context "Main navigation item" %} (<b>{{ user }}</b>)</li>
+    <li>Мой аккаунт (<b>{{ user }}</b>)</li>
   </ul>
 {% endblock breadcrumb %}
 
@@ -56,16 +56,16 @@
             <div class="table__header">
               <div class="row">
                 <div class="col-md-2 col-3">
-                  <small>{% trans "Order" context "Recent orders column title" %}</small>
+                  <small>Заказ</small>
                 </div>
                 <div class="col-md-3 d-none d-md-block">
-                  <small>{% trans "Date" context "Recent orders column title" %}</small>
+                  <small>Дата</small>
                 </div>
                 <div class="col-md-2 col-4 text-right">
-                  <small>{% trans "Summary" context "Recent orders column title" %}</small>
+                  <small>Итог</small>
                 </div>
                 <div class="col-md-4 d-none d-md-block">
-                  <small>{% trans "Status" context "Recent orders column title" %}</small>
+                  <small>Статус</small>
                 </div>
                 <div class="col-md-1 col-5"></div>
               </div>
@@ -123,32 +123,29 @@
       <div class="tab-pane fade" id="addresses" role="tabpanel">
         <div class="card-deck-wrapper account__addresses">
           <div class="row card-deck">
-            {% for address in addresses %}
-              <div class="col-md-6">
+          <div class="col-md-2"></div>
+              <div class="col-md-8">
                 <div class="card card-block">
-                  {% format_address address %}
-                  <ul class="icons">
-                    <li>
-                      <a href="{% url "account:address-edit" pk=address.pk %}">
-                        {% trans "Edit" context "User address action" %}
-                      </a>
-                    </li>
-                    <li>
-                      <a class="delete-icon">
-                        <svg data-src="{% static "images/delete.svg" %}" height="20px" width="20px" />
-                      </a>
-                    </li>
-                  </ul>
-                  {% include "account/address_delete.html" with pk=address.pk %}
+                    <p class="text-sm-center">
+                      {{user.last_name}} {{user.first_name}}
+                    </p>
+                    </br>
+                    
+                    {% if user.delivery_address %}
+                    <p class="text-sm-center">
+                      Адрес: {{user.delivery_address}}
+                    </p>
+                    </br>
+                    {% endif %}
+                    <p class="text-sm-center">
+                      Номер телефона: <strong>{{user.phone}}</strong>
+                    </p>
+                    <a class="text-sm-right" href="{% url "account:address-edit" pk=user.pk %}">
+                      Редактировать
+                    </a>
                 </div>
               </div>
-            {% endfor %}
           </div>
-          {% if addresses|length == 0 %}
-            <h3 class="text-sm-center">
-              {% trans "You will see new addresses here after first successful checkout." context "No addresses text" %}
-            </h3>
-          {% endif %}
         </div>
       </div>
       <div class="tab-pane fade" id="settings" role="tabpanel">
@@ -158,11 +155,11 @@
               {% csrf_token %}
               <p>
                 {% blocktrans context "Message informing about the process of account removal" %}
-                  If you'd like to remove your account, please click on the button below and a confirmation email will be sent to you.
+                  Если вы хотите удалить свой аккаунт, нажмите на кнопку ниже. На ваш email придет письмо с подтверждением.
                 {% endblocktrans %}
               </p>
               <button type="submit" class="btn danger narrow text-center">
-                {% trans "Remove Account" context "Remove account form action" %}
+                Удалить аккаунт
               </button>
             </form>
           </div>

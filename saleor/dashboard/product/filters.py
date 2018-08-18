@@ -9,6 +9,7 @@ from ...product.models import Category, Product, ProductAttribute, ProductType
 from ..widgets import MoneyRangeWidget
 
 PRODUCT_SORT_BY_FIELDS = {
+    'pk': pgettext_lazy('Product list sorting option', 'id'),
     'name': pgettext_lazy('Product list sorting option', 'name'),
     'price': pgettext_lazy('Product type list sorting option', 'price')}
 

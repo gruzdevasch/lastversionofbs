@@ -56,11 +56,11 @@
             <span>
               {% if now_sorted_by == 'name' %}
                 {% blocktrans trimmed %}
-                  Sort by: <b>name</b>
+                  Сортировать по: <b>имени</b>
                 {% endblocktrans %}
               {% elif now_sorted_by == 'price' %}
                 {% blocktrans trimmed %}
-                  Sort by: <b>price</b>
+                  Сортировать по: <b>цене</b>
                 {% endblocktrans %}
               {% endif %}
             </span>
@@ -77,20 +77,19 @@
           {% for choice, label in sort_by_choices.items %}
             <li>
               <div class="row">
-                <div class="col-6">
-                  {% trans 'Sort by' context 'Product list filters' %}:
+                <div class="col-4">
                   <strong>{{ label }}</strong>
                 </div>
-                <div class="col-6">
+                <div class="col-8">
                   <div>
                     <a href="{% get_sort_by_url choice %}">
-                      <span>{% trans 'ascending' context 'sort by option' %}</span>
+                      <span>по возрастанию</span>
                       <div class="sort-order-icon float-right">
                         <img class="lazyload lazypreload" data-src="{% static "images/arrow-up.svg" %}">
                       </div>
                     </a>
                     <a href="{% get_sort_by_url choice descending=True %}">
-                      <span>{% trans 'descending' context 'sort by option' %}</span>
+                      <span>по убыванию</span>
                       <div class="sort-order-icon float-right">
                         <img class="lazyload lazypreload" data-src="{% static "images/arrow-down.svg" %}">
                       </div>

@@ -14,9 +14,13 @@ from .shipping.urls import urlpatterns as shipping_urls
 from .sites.urls import urlpatterns as site_urls
 from .staff.urls import urlpatterns as staff_urls
 from .taxes.urls import urlpatterns as taxes_urls
+from .suplier.urls import urlpatterns as suplier_urls
+from .suplierorder.urls import urlpatterns as suplierorder_urls
 
 urlpatterns = [
     url(r'^$', core_views.index, name='index'),
+    url(r'^supliers/', include(suplier_urls)),
+    url(r'^suplierorders/', include(suplierorder_urls)),
     url(r'^categories/', include(category_urls)),
     url(r'^collections/', include(collection_urls)),
     url(r'^orders/', include(order_urls)),

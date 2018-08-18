@@ -5,6 +5,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 
 from ...core.utils import build_absolute_uri
+from ...site.models import SiteSettings
 
 
 def get_webpage_schema(request):
@@ -16,7 +17,8 @@ def get_webpage_schema(request):
         '@type': 'WebSite',
         'url': url,
         'name': site.name,
-        'description': site.settings.description}
+        'description': site.settings.description
+        }
     if settings.ENABLE_SEARCH:
         search_url = urljoin(url, reverse('search:search'))
         data['potentialAction'] = {

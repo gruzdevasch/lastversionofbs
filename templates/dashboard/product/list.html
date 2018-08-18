@@ -45,6 +45,21 @@
 {% block content %}
   <div class="row">
     <div class="col s12 l9" id="product-list">
+    <form method="post"  action="{% url 'dashboard:simple_product_upload' %}" enctype="multipart/form-data" id="huh">
+        {% csrf_token %}
+        <input type="file" name="myfile">
+        <button type="submit">Загрузить продукты</button>
+     </form>
+     <form method="post"  action="{% url 'dashboard:simple_variant_upload' %}" enctype="multipart/form-data" id="huh2">
+        {% csrf_token %}
+        <input type="file" name="myfile">
+        <button type="submit">Загрузить варианты</button>
+     </form>
+     <form method="post"  action="{% url 'dashboard:simple_picture_upload' %}" enctype="multipart/form-data" id="huh3">
+        {% csrf_token %}
+        <input type="file" name="myfile">
+        <button type="submit">Загрузить картинки</button>
+     </form>
     {% if products %}
       <div class="card">
         <form method="POST" action="{% url 'dashboard:product-bulk-update' %}" novalidate id="bulk-actions-form">
@@ -60,6 +75,8 @@
                 <label for="select-all-items"></label>
               </th>
               <th></th>
+              {% sorting_header 'pk' 'id' %}
+              
               {% trans "Name" context "Products list table header" as label %}
               {% sorting_header 'name' label is_wide=True %}
 
@@ -78,6 +95,9 @@
                 <img src="{% product_first_image product size="60x60" method="crop" %}"
                     srcset="{% product_first_image product size="60x60" method="crop" %} 1x, {% product_first_image product size="120x120" method="crop" %} 2x"
                     alt="">
+              </td>
+              <td>
+                #{{ product.pk }}
               </td>
               <td>
                 {{ product.name }}

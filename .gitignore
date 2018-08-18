@@ -20,7 +20,9 @@
 local_settings.py
 __pycache__/
 build/
+node_modules/
 coverage/
+media/products/
 dist/
 *\.egg*
 # data

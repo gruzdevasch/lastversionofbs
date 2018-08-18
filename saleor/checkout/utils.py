@@ -13,7 +13,7 @@ from prices import TaxedMoneyRange
 
 from . import AddressType, logger
 from ..account.forms import get_address_form
-from ..account.models import Address
+from ..account.models import Address, User
 from ..account.utils import store_user_address
 from ..core.exceptions import InsufficientStock
 from ..core.utils import to_local_currency
@@ -296,11 +296,11 @@ def add_variant_to_cart(
     line, _ = cart.lines.get_or_create(
         variant=variant, defaults={'quantity': 0, 'data': {}})
     new_quantity = quantity if replace else (quantity + line.quantity)
-
+    
     if new_quantity < 0:
         raise ValueError('%r is not a valid quantity (results in %r)' % (
             quantity, new_quantity))
-
+    
     if new_quantity == 0:
         line.delete()
     else:
@@ -493,14 +493,14 @@ def get_summary_without_shipping_forms(cart, user_addresses, data, country):
             data,
             autocomplete_type='billing',
             country_code=billing_address.country.code,
-            initial={'country': billing_address.country})
+            initial={'country': billing_address.country, 'first_name': cart.user.first_name, 'last_name': cart.user.last_name,'country_area': "Красноярский край"})
         initial_address = billing_address.id
     elif billing_address:
         address_form, preview = get_address_form(
             data,
             autocomplete_type='billing',
             country_code=billing_address.country.code,
-            initial={'country': billing_address.country},
+            initial={'country': billing_address.country, 'first_name': cart.user.first_name, 'last_name': cart.user.last_name,'country_area': "Красноярский край"},
             instance=billing_address)
         initial_address = AddressChoiceForm.NEW_ADDRESS
     else:
@@ -508,7 +508,7 @@ def get_summary_without_shipping_forms(cart, user_addresses, data, country):
             data,
             autocomplete_type='billing',
             country_code=country.code,
-            initial={'country': country})
+            initial={'country': country, 'first_name': cart.user.first_name, 'last_name': cart.user.last_name, 'country_area': "Красноярский край"})
         if cart.user and cart.user.default_billing_address:
             initial_address = cart.user.default_billing_address.id
         else:
@@ -745,7 +745,7 @@ def _process_voucher_data_for_order(cart):
     if cart.voucher_code and not voucher:
         msg = pgettext(
             'Voucher not applicable',
-            'Voucher expired in meantime. Order placement aborted.')
+            'Срок купона истек. Размещение заказа отменено.')
         raise NotApplicable(msg)
 
     if not voucher:
@@ -781,10 +781,10 @@ def _process_user_data_for_order(cart):
     """Fetch, process and return shipping data from cart."""
     billing_address = cart.billing_address
 
-    if cart.user:
+    """if cart.user:
         store_user_address(cart.user, billing_address, AddressType.BILLING)
         if cart.user.addresses.filter(pk=billing_address.pk).exists():
-            billing_address = billing_address.get_copy()
+            billing_address = billing_address.get_copy()"""
 
     return {
         'user': cart.user,
@@ -818,6 +818,7 @@ def create_order(cart, tracking_code, discounts, taxes):
     which language to use when sending email.
     """
     # FIXME: save locale along with the language
+    
     try:
         order_data = _process_voucher_data_for_order(cart)
     except NotApplicable:

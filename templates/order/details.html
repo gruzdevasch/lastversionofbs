@@ -4,6 +4,7 @@
 {% load staticfiles %}
 {% load bootstrap_form from bootstrap4 %}
 
+{% load status %}
 {% block title %}
   {% blocktrans trimmed context "Order details page title" %}
     Order {{ order }}
@@ -15,18 +16,18 @@
     <ul class="breadcrumbs list-unstyled">
       <li>
         <a href="{% url 'home'%}">
-          {% trans "Home" context "Main navigation item" %}
+          Главная
         </a>
       </li>
       <li>
         <a href="{% url "account:details" %}">
-          {% trans "Your account" context "Main navigation item" %}
+          Мой аккаунт
         </a>
       </li>
       <li>
         <a href="{{ order.get_absolute_url }}">
           {% blocktrans trimmed context "Order details breadcrumb" %}
-            Order {{ order }}
+            Заказ {{ order }}
           {% endblocktrans %}
         </a>
       </li>
@@ -46,56 +47,46 @@
   <div class="row order-details">
     <div class="col-lg-10 m-auto">
       <h2 class="order-details__header">
-        {% blocktrans trimmed with order_status=order.get_status_display context "Order detail text" %}
-          Order {{ order }}: {{ order_status }}
-        {% endblocktrans %}
+        Заказ {{ order }}: {% render_order_status order.status order.get_status_display %}
       </h2>
       {% if not order.is_fully_paid %}
         {% if order.is_pre_authorized %}
           <a href="{% url "order:payment" token=order.token %}" class="btn btn-link">
-            {% trans "Payment details" context "Order details link text" %}
+            Информация об оплате
           </a>
         {% else %}
           <a href="{% url "order:payment" token=order.token %}" class="btn primary">
-            {% trans "Pay for order" context "Order details primary action" %}
+            Оплатить заказ
           </a>
         {% endif %}
       {% endif %}
       {% include "order/_ordered_items_table.html" %}
       <div class="order-notes">
       {% if notes %}
-        <h2 class="order-notes__header">{% trans "Notes" context "Order notes list" %}</h2>
+        <h2 class="order-notes__header">Комментарии к заказу</h2>
         {% for note in notes %}
           <small>
             {% if note.user %}
               {% if note.user == user %}
                 {% blocktrans with date=note.date %}
-                  {{ date }} by you
+                  {{ date }} отправлено вами
                 {% endblocktrans %}
               {% elif note.user.is_staff %}
-                {% trans 'staff' context 'Order note author is staff' as note_author_staff %}
+                {% trans 'Администратор' context 'Order note author is staff' as note_author_staff %}
                 {% blocktrans with author=note_author_staff date=note.date %}
-                  {{ date }} by <span class="text-muted">{{ author }}</span>
-                {% endblocktrans %}
-              {% else %}
-                {% blocktrans with author=note.user date=note.date %}
-                  {{ date }} by {{ author }}
+                  {{ date }} <span class="text-muted">{{ author }}</span>
                 {% endblocktrans %}
               {% endif %}
-            {% else %}
-              {% blocktrans with date=note.date %}
-                {{ date }} by anonymous customer
-              {% endblocktrans %}
             {% endif %}
           </small>
           <p>{{ note.content }}</p>
         {% endfor %}
       {% endif %}
-      {% if order.is_open %}
+      {% if order.is_open and user == order.user%}
         <form method="post" class="form-group">
           {% csrf_token %}
           {% bootstrap_form note_form display_labels=False %}
-          <input type="submit" value="Submit" class="btn primary" />
+          <input type="submit" value="Отправить" class="btn primary" />
         </form>
       {% endif %}
       </div>
